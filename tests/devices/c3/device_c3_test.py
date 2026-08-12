@@ -4,12 +4,12 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.c3 import (
+from midealan.const import ProtocolVersion
+from midealan.devices.c3 import (
     DeviceAttributes,
     MideaC3Device,
 )
-from midealocal.devices.c3.message import (
+from midealan.devices.c3.message import (
     C3DeviceMode,
     C3SilentLevel,
     MessageQueryBasic,
@@ -132,7 +132,7 @@ class TestMideaC3Device:
 
     def test_process_message(self) -> None:
         """Test process message."""
-        with patch("midealocal.devices.c3.MessageC3Response") as mock_message_response:
+        with patch("midealan.devices.c3.MessageC3Response") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.zone1_power = True
             mock_message.zone2_power = False
@@ -227,7 +227,7 @@ class TestMideaC3Device:
         """Test set target temperature."""
         with pytest.raises(ValueError):  # noqa: PT011
             self.device.set_target_temperature(22.5, 1)
-        with patch("midealocal.devices.c3.MessageC3Response") as mock_message_response:
+        with patch("midealan.devices.c3.MessageC3Response") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.zone_temp_type = [True, False]
             self.device.process_message(b"")

@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.devices.e8 import DeviceAttributes, MideaE8Device
-from midealocal.devices.e8.message import MessageE8Base, MessageQuery
-from midealocal.message import ListTypes, MessageType
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.devices.e8 import DeviceAttributes, MideaE8Device
+from midealan.devices.e8.message import MessageE8Base, MessageQuery
+from midealan.message import ListTypes, MessageType
 
 
 class TestMideaE8Device:

@@ -2,15 +2,15 @@
 
 import pytest
 
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.devices.e6.message import (
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.devices.e6.message import (
     E6GeneralMessageBody,
     MessageE6Base,
     MessageE6Response,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 class TestMessageE6Base:

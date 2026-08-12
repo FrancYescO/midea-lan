@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b3 import DeviceAttributes, MideaB3Device
-from midealocal.devices.b3.message import MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.b3 import DeviceAttributes, MideaB3Device
+from midealan.devices.b3.message import MessageQuery
+from midealan.message import MessageType
 
 
 class TestMideaB3Device:

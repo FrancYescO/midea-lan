@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.e1.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.e1.message import (
     E1GeneralMessageBody,
     MessageE1Base,
     MessageE1Response,
@@ -13,7 +13,7 @@ from midealocal.devices.e1.message import (
     MessageStorage,
     MessageWork,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def test_work_message_body() -> None:

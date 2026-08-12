@@ -1,4 +1,4 @@
-"""setup midea-local."""
+"""setup midea-lan."""
 
 from pathlib import Path
 
@@ -13,29 +13,29 @@ with requirements.open(encoding="utf-8") as fp:
     requires = fp.read().splitlines()
 
 version: dict = {}
-version_file = Path("midealocal", "version.py")
+version_file = Path("midealan", "version.py")
 with version_file.open(encoding="utf-8") as fp:
     exec(fp.read(), version)  # noqa: S102
 
 
 setuptools.setup(
-    name="midea-local",
+    name="midea-lan",
     version=version["__version__"],
-    author="rokam",
-    author_email="lucas@mindello.com.br",
-    description="Control your Midea M-Smart appliances via local area network",
+    author="wuwentao",
+    author_email="wuwentao2000@126.com",
+    description="Control your Midea M-Smart appliances via LAN network",
     license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/midea-lan/midea-local",
+    url="https://github.com/wuwentao/midea-lan",
     install_requires=requires,
     packages=setuptools.find_packages(
-        include=["midealocal", "midealocal.*"],
+        include=["midealan", "midealan.*"],
         exclude=["tests", "tests.*"],
     ),
     entry_points={
         "console_scripts": [
-            "midealocal = midealocal.cli:main",
+            "midealan = midealan.cli:main",
         ],
     },
     python_requires=">=3.12",

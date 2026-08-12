@@ -1,6 +1,6 @@
 """CRC8 Test."""
 
-from midealocal.crc8 import calculate
+from midealan.crc8 import calculate
 
 
 def test_calculate() -> None:

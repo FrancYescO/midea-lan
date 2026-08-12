@@ -1,9 +1,9 @@
 """Midea local device selector tests."""
 
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.devices import device_selector
-from midealocal.devices.ac import MideaACDevice
-from midealocal.devices.x13 import Midea13Device
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.devices import device_selector
+from midealan.devices.ac import MideaACDevice
+from midealan.devices.x13 import Midea13Device
 
 
 class TestDeviceSelector:

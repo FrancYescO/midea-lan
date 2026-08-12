@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ca import DeviceAttributes, MideaCADevice
-from midealocal.devices.ca.message import MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.ca import DeviceAttributes, MideaCADevice
+from midealan.devices.ca.message import MessageQuery
+from midealan.message import MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

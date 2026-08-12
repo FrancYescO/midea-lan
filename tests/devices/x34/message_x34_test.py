@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.x34.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.x34.message import (
     Message34Base,
     Message34Body,
     MessageLock,
@@ -11,7 +11,7 @@ from midealocal.devices.x34.message import (
     MessageQuery,
     MessageStorage,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessage34Base:

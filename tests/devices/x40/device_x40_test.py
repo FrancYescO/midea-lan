@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.x40 import DeviceAttributes, MideaX40Device
-from midealocal.devices.x40.message import MessageQuery, MessageSet
+from midealan.const import ProtocolVersion
+from midealan.devices.x40 import DeviceAttributes, MideaX40Device
+from midealan.devices.x40.message import MessageQuery, MessageSet
 
 
 class TestMideaX40Device:
@@ -33,7 +33,7 @@ class TestMideaX40Device:
     def test_customize(self) -> None:
         """Test precision halves."""
         with patch(
-            "midealocal.devices.x40.MessageX40Response",
+            "midealan.devices.x40.MessageX40Response",
         ) as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.light = True

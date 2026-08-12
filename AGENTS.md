@@ -1,10 +1,10 @@
 # AGENTS.md
 
 Guidance for AI coding agents (GitHub Copilot, Claude Code, Gemini CLI, Codex, etc.)
-working in the `midea-local` repository. This is the canonical instructions file;
+working in the `midea-lan` repository. This is the canonical instructions file;
 `CLAUDE.md` and `.github/copilot-instructions.md` point here.
 
-`midea-local` is a Python library to control Midea M-Smart appliances over the local
+`midea-lan` is a Python library to control Midea M-Smart appliances over the LAN
 network. It handles device discovery, the encrypted Midea LAN protocol, and per-device
 message encoding/decoding. Python ≥ 3.12 (CI tests 3.12–3.14).
 
@@ -19,10 +19,10 @@ use that environment.
 - Run all tests: `uv run python -m pytest ./tests/`
 - Run one test file: `uv run python -m pytest tests/devices/ac/message_ac_test.py`
 - Run one test: `uv run python -m pytest tests/devices/ac/message_ac_test.py::TestACMessage::test_message_query -v`
-- Coverage (as CI does): `uv run python -m pytest --cov=midealocal --cov-report xml ./tests/`
+- Coverage (as CI does): `uv run python -m pytest --cov=midealan --cov-report xml ./tests/`
 - Lint/format/type-check all at once via `uv run prek run --all-files`. Individually:
-  `uv run ruff check .`, `uv run ruff format .`, `uv run mypy midealocal`,
-  `uv run pylint --rcfile=pylintrc midealocal`.
+  `uv run ruff check .`, `uv run ruff format .`, `uv run mypy midealan`,
+  `uv run pylint --rcfile=pylintrc midealan`.
 
 `ruff` uses `lint.select = ["ALL"]` with curated ignores in `ruff.toml`; `mypy` runs in
 strict mode (`mypy.ini`). Fix all reported issues before committing — CI runs the full
@@ -47,7 +47,7 @@ across all three:
 Entry points: `discover.py` finds devices on the LAN; `devices/__init__.py`
 `device_selector()` dynamically `import_module`s the right `devices/<type>` package and
 instantiates its `MideaAppliance`. `cloud.py` retrieves token/key from Midea cloud
-accounts. `cli.py` (`python3 -m midealocal.cli` / `midealocal`) and `library_test.py` are
+accounts. `cli.py` (`python3 -m midealan.cli` / `midealan`) and `library_test.py` are
 user-facing harnesses.
 
 ## Conventions specific to this codebase

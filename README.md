@@ -1,7 +1,7 @@
-# Midea-local python lib
+# midea-lan python lib
 
-[![Python build](https://github.com/midea-lan/midea-local/actions/workflows/python-build.yml/badge.svg)](https://github.com/midea-lan/midea-local/actions/workflows/python-build.yml)
-[![codecov](https://codecov.io/github/midea-lan/midea-local/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/midea-lan/midea-local)
+[![Python build](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml/badge.svg)](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml)
+[![codecov](https://codecov.io/github/wuwentao/midea-lan/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/wuwentao/midea-lan)
 
 > [中文版 / Chinese README](./README_hans.md)
 
@@ -16,20 +16,20 @@ This library is part of https://github.com/georgezhao2010/midea_ac_lan code. It 
 ### Finding your device
 
 ```python3
-from midealocal.discover import discover
+from midealan.discover import discover
 # Without knowing the ip address
 discover()
 # If you know the ip address
 discover(ip_address="203.0.113.11")
-# The device type is in hexadecimal as in midealocal/devices/TYPE
+# The device type is in hexadecimal as in midealan/devices/TYPE
 type_code = hex(list(discover().values())[0]['type'])[2:]
 ```
 
 ### Getting data from device
 
 ```python3
-from midealocal.discover import discover
-from midealocal.devices import device_selector
+from midealan.discover import discover
+from midealan.devices import device_selector
 
 token = '...'
 key = '...'
@@ -65,7 +65,7 @@ ac.set_swing(False, False)
 ### command line tool
 
 ```python3
-python3 -m midealocal.cli -h
+python3 -m midealan.cli -h
 ```
 
 ## Development
@@ -74,8 +74,8 @@ This project uses [uv](https://docs.astral.sh/uv/) for its development environme
 After [installing uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
-git clone https://github.com/midea-lan/midea-local.git
-cd midea-local
+git clone https://github.com/wuwentao/midea-lan.git
+cd midea-lan
 ./scripts/setup.sh          # Linux / macOS / WSL2  (Windows: scripts\setup.ps1)
 ```
 

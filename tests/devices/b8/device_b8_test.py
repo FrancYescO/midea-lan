@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b8 import (
+from midealan.const import ProtocolVersion
+from midealan.devices.b8 import (
     B8CleanMode,
     B8ControlType,
     B8ErrorCanFixDescription,
@@ -21,12 +21,12 @@ from midealocal.devices.b8 import (
     DeviceAttributes,
     MideaB8Device,
 )
-from midealocal.devices.b8.message import (
+from midealan.devices.b8.message import (
     B8ErrorRebootDescription,
     B8ErrorWarningDescription,
     MessageQuery,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 class TestMideaB8Device:
@@ -469,7 +469,7 @@ class TestMideaB8Device:
             + [0x0] * 20,
         )
 
-        with patch("midealocal.message.MessageResponse.set_attr") as mock_set_attr:
+        with patch("midealan.message.MessageResponse.set_attr") as mock_set_attr:
             self.device.process_message(bytes(header + body))
 
             body = bytearray(

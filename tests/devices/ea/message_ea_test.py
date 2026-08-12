@@ -2,9 +2,9 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ea.message import MessageEABase, MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.ea.message import MessageEABase, MessageQuery
+from midealan.message import MessageType
 
 
 class TestMessageEABase:

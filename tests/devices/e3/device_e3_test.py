@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.e3 import DeviceAttributes, MideaE3Device
-from midealocal.devices.e3.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.e3 import DeviceAttributes, MideaE3Device
+from midealan.devices.e3.message import (
     MessageNewProtocolSet,
     MessagePower,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 class TestMideaE3Device:

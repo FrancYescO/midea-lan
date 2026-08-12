@@ -2,15 +2,15 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.fa.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.fa.message import (
     FAGeneralMessageBody,
     MessageFABase,
     MessageFAResponse,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 SHORT_BODY_LENGTH = 18
 LONG_BODY_LENGTH = 49

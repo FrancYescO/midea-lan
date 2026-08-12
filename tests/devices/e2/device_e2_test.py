@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.e2 import (
+from midealan.const import ProtocolVersion
+from midealan.devices.e2 import (
     DeviceAttributes,
     E2SubType,
     MideaE2Device,
     OldProtocol,
 )
-from midealocal.devices.e2.message import (
+from midealan.devices.e2.message import (
     MessageNewProtocolSet,
     MessagePower,
     MessageQuery,
@@ -56,7 +56,7 @@ class TestMideaE2Device:
         device = self._device(customize)
 
         with patch(
-            "midealocal.devices.e2.MessageE2Response",
+            "midealan.devices.e2.MessageE2Response",
             return_value=FakeMessage(),
         ):
             status = device.process_message(b"")
@@ -85,7 +85,7 @@ class TestMideaE2Device:
         device = self._device(customize)
 
         with patch(
-            "midealocal.devices.e2.MessageE2Response",
+            "midealan.devices.e2.MessageE2Response",
             return_value=FakeMessage(),
         ):
             status = device.process_message(b"")

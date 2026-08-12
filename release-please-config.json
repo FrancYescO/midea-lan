@@ -3,7 +3,7 @@
   "packages": {
     ".": {
       "release-type": "python",
-      "package-name": "midea-local"
+      "package-name": "midea-lan"
     }
   }
 }

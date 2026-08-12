@@ -2,13 +2,13 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.cf.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.cf.message import (
     MessageCFBase,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageCFBase:

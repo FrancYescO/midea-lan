@@ -1,4 +1,4 @@
-"""Midea Local CLI tests."""
+"""Midea Lan CLI tests."""
 
 import json
 import logging
@@ -14,16 +14,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from midealocal.cli import (
+from midealan.cli import (
     MideaCLI,
     get_config_file_path,
     main,
 )
-from midealocal.cloud import MideaAirCloud, SmartHomeCloud
-from midealocal.const import ProtocolVersion
-from midealocal.device import AuthException, NoSupportedProtocol
-from midealocal.discover import _extract_mac
-from midealocal.exceptions import SocketException
+from midealan.cloud import MideaAirCloud, SmartHomeCloud
+from midealan.const import ProtocolVersion
+from midealan.device import AuthException, NoSupportedProtocol
+from midealan.discover import _extract_mac
+from midealan.exceptions import SocketException
 
 
 class TestMideaCLI(IsolatedAsyncioTestCase):
@@ -73,7 +73,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         """Test get keys."""
         mock_cloud = AsyncMock()
         with (
-            patch("midealocal.cli.get_midea_cloud", return_value=mock_cloud),
+            patch("midealan.cli.get_midea_cloud", return_value=mock_cloud),
             patch.object(
                 mock_cloud,
                 "get_default_keys",
@@ -144,7 +144,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         mock_device_instance.connect.return_value = True
         with (
             patch(
-                "midealocal.cli.discover",
+                "midealan.cli.discover",
             ) as mock_discover,
             patch.object(
                 self.cli,
@@ -152,7 +152,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
                 return_value=mock_cloud_instance,
             ),
             patch(
-                "midealocal.cli.device_selector",
+                "midealan.cli.device_selector",
                 return_value=mock_device_instance,
             ),
             patch.object(
@@ -213,7 +213,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         """Test message."""
         mock_device_instance = MagicMock()
         with patch(
-            "midealocal.cli.device_selector",
+            "midealan.cli.device_selector",
             return_value=mock_device_instance,
         ) as mock_device_selector:
             mock_device_selector.return_value = mock_device_instance
@@ -240,7 +240,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
     def test_save(self) -> None:
         """Test save."""
         mock_path_instance = MagicMock()
-        with patch("midealocal.cli.get_config_file_path") as mock_get_config_file_path:
+        with patch("midealan.cli.get_config_file_path") as mock_get_config_file_path:
             mock_get_config_file_path.return_value = mock_path_instance
 
             self.cli.save()
@@ -272,7 +272,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         mock_cloud_instance = AsyncMock()
         with (
             patch(
-                "midealocal.cli.discover",
+                "midealan.cli.discover",
                 side_effect=[
                     {},  # test no device
                     {1: mock_device},  # test cloud login failed
@@ -443,7 +443,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         cmd = [
             sys.executable,
             "-m",
-            "midealocal.cli",
+            "midealan.cli",
         ]
         clear_config = False
         if not get_config_file_path().exists():
@@ -471,16 +471,16 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
     def test_main(self) -> None:
         """Test main entry parses args and merges config file values."""
         with TemporaryDirectory() as tmpdir:
-            config_file = Path(tmpdir) / "midea-local.json"
+            config_file = Path(tmpdir) / "midea-lan.json"
             config_file.write_text(
                 json.dumps({"username": "configuser", "password": "configpass"}),
                 encoding="utf-8",
             )
             exit_code: int | str | None = None
             with (
-                patch.object(sys, "argv", ["midealocal", "discover", "-p", "argpass"]),
+                patch.object(sys, "argv", ["midealan", "discover", "-p", "argpass"]),
                 patch(
-                    "midealocal.cli.get_config_file_path",
+                    "midealan.cli.get_config_file_path",
                     return_value=config_file,
                 ),
                 patch.object(MideaCLI, "run") as mock_run,
@@ -502,13 +502,13 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
     def test_main_module_entry(self) -> None:
         """Test the __main__ guard when running the module as a script."""
         with (
-            patch.object(sys, "argv", ["midealocal.cli", "--version"]),
+            patch.object(sys, "argv", ["midealan.cli", "--version"]),
             warnings.catch_warnings(),
         ):
             # runpy warns when re-executing an already imported module
             warnings.simplefilter("ignore", RuntimeWarning)
             with pytest.raises(SystemExit) as exit_info:
-                runpy.run_module("midealocal.cli", run_name="__main__")
+                runpy.run_module("midealan.cli", run_name="__main__")
 
         assert exit_info.value.code == 0
 
@@ -516,7 +516,7 @@ class TestMideaCLI(IsolatedAsyncioTestCase):
         """Test get config file path."""
         mock_path = MagicMock()
         with (
-            patch("midealocal.cli.Path", return_value=mock_path),
+            patch("midealan.cli.Path", return_value=mock_path),
             patch.object(mock_path, "exists", return_value=False),
         ):
             get_config_file_path()

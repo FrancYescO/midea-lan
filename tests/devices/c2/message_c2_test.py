@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.c2.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.c2.message import (
     C2Notify1MessageBody,
     MessageC2Base,
     MessagePower,
@@ -11,7 +11,7 @@ from midealocal.devices.c2.message import (
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageC2Base:

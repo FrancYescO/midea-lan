@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.a1 import DeviceAttributes, MideaA1Device
-from midealocal.devices.a1.message import MessageQuery, MessageSet
+from midealan.const import ProtocolVersion
+from midealan.devices.a1 import DeviceAttributes, MideaA1Device
+from midealan.devices.a1.message import MessageQuery, MessageSet
 
 
 class TestMideaA1Device:
@@ -63,7 +63,7 @@ class TestMideaA1Device:
 
     def test_process_message(self) -> None:
         """Test process message."""
-        with patch("midealocal.devices.a1.MessageA1Response") as mock_message_response:
+        with patch("midealan.devices.a1.MessageA1Response") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.protocol_version = ProtocolVersion.V3
             mock_message.power = True
@@ -100,7 +100,7 @@ class TestMideaA1Device:
 
     def test_make_message_set(self) -> None:
         """Test make message set."""
-        with patch("midealocal.devices.a1.MessageA1Response") as mock_message_response:
+        with patch("midealan.devices.a1.MessageA1Response") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.protocol_version = ProtocolVersion.V3
             mock_message.power = True

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from midealocal.discover import (
+from midealan.discover import (
     _extract_mac,
     _parse_discover_response,
     bytes2port,
@@ -13,8 +13,8 @@ from midealocal.discover import (
     get_device_info,
     get_id_from_response,
 )
-from midealocal.exceptions import ElementMissing
-from midealocal.security import LocalSecurity
+from midealan.exceptions import ElementMissing
+from midealan.security import LocalSecurity
 
 SSID = b"net_ac_XXXX"
 SN_TYPE1 = b"000000000" + b"12345678" + b"abbccddeeff" + b"0000"
@@ -164,7 +164,7 @@ class TestParseDiscoverResponse:
         data = V1_XML % sn.encode()
         sock = _mock_sock_with(data)
         with patch(
-            "midealocal.discover.get_device_info",
+            "midealan.discover.get_device_info",
             return_value=_build_id_response(),
         ) as mock_info:
             device_id, device = _parse_discover_response(sock, {})
@@ -200,7 +200,7 @@ class TestParseDiscoverResponse:
             b"</body></root>" % SN_TYPE1
         )
         with patch(
-            "midealocal.discover.get_device_info",
+            "midealan.discover.get_device_info",
             return_value=_build_id_response(),
         ):
             device_id, device = _parse_discover_response(_mock_sock_with(data), {})
@@ -223,9 +223,9 @@ class TestDiscover:
         mock_socket = MagicMock()
         mock_socket.__enter__.return_value = sock
         with (
-            patch("midealocal.discover.socket.socket", return_value=mock_socket),
+            patch("midealan.discover.socket.socket", return_value=mock_socket),
             patch(
-                "midealocal.discover.enum_all_broadcast",
+                "midealan.discover.enum_all_broadcast",
                 return_value=["192.168.1.255"],
             ),
         ):
@@ -243,7 +243,7 @@ class TestDiscover:
         ]
         mock_socket = MagicMock()
         mock_socket.__enter__.return_value = sock
-        with patch("midealocal.discover.socket.socket", return_value=mock_socket):
+        with patch("midealan.discover.socket.socket", return_value=mock_socket):
             result = discover(discover_type=[0xFF], ip_address=["192.168.1.255"])
         assert result == {}
 
@@ -254,7 +254,7 @@ class TestDiscover:
         sock.recvfrom.side_effect = [OSError("bad recv"), TimeoutError]
         mock_socket = MagicMock()
         mock_socket.__enter__.return_value = sock
-        with patch("midealocal.discover.socket.socket", return_value=mock_socket):
+        with patch("midealan.discover.socket.socket", return_value=mock_socket):
             result = discover(ip_address=["192.168.1.255"])
         assert result == {}
 
@@ -314,7 +314,7 @@ class TestGetDeviceInfo:
         sock.recv.return_value = b"\x12\x34"
         mock_socket = MagicMock()
         mock_socket.__enter__.return_value = sock
-        with patch("midealocal.discover.socket.socket", return_value=mock_socket):
+        with patch("midealan.discover.socket.socket", return_value=mock_socket):
             assert get_device_info(DEVICE_IP, DEVICE_PORT) == bytearray(b"\x12\x34")
         sock.connect.assert_called_once_with((DEVICE_IP, DEVICE_PORT))
         sock.sendall.assert_called_once()
@@ -326,7 +326,7 @@ class TestGetDeviceInfo:
         sock.connect.side_effect = exception
         mock_socket = MagicMock()
         mock_socket.__enter__.return_value = sock
-        with patch("midealocal.discover.socket.socket", return_value=mock_socket):
+        with patch("midealan.discover.socket.socket", return_value=mock_socket):
             assert get_device_info(DEVICE_IP, DEVICE_PORT) == bytearray(0)
 
 
@@ -358,7 +358,7 @@ def test_enum_all_broadcast() -> None:
         _mock_ip("fe80::1", is_ipv4=False),  # not IPv4
     ]
     with patch(
-        "midealocal.discover.ifaddr.get_adapters",
+        "midealan.discover.ifaddr.get_adapters",
         return_value=[adapter],
     ):
         assert enum_all_broadcast() == ["192.168.1.255", "10.255.255.255"]

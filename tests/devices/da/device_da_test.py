@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.da import DeviceAttributes, MideaDADevice
-from midealocal.devices.da.message import MessageQuery
-from midealocal.exceptions import ValueWrongType
+from midealan.const import ProtocolVersion
+from midealan.devices.da import DeviceAttributes, MideaDADevice
+from midealan.devices.da.message import MessageQuery
+from midealan.exceptions import ValueWrongType
 
 
 class TestMideaDADevice:
@@ -53,7 +53,7 @@ class TestMideaDADevice:
 
     def test_process_message(self) -> None:
         """Test process message."""
-        with patch("midealocal.devices.da.MessageDAResponse") as mock_message_response:
+        with patch("midealan.devices.da.MessageDAResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.protocol_version = ProtocolVersion.V3
             mock_message.power = True

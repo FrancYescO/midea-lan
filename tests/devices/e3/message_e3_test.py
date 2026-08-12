@@ -2,15 +2,15 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.e3.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.e3.message import (
     MessageE3Base,
     MessageNewProtocolSet,
     MessagePower,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageE3Base:

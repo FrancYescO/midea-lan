@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap the midea-local development environment with uv.
+# Bootstrap the midea-lan development environment with uv.
 #
 # Prerequisite: install uv first (https://docs.astral.sh/uv/getting-started/installation/):
 #   curl -LsSf https://astral.sh/uv/install.sh | sh

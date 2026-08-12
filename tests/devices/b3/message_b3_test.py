@@ -2,13 +2,13 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b3.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.b3.message import (
     B3MessageBody24,
     MessageB3Base,
     MessageQuery,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageB3Base:

@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from aiohttp import ClientConnectionError
 
-from midealocal.cloud import (
+from midealan.cloud import (
     DEFAULT_KEYS,
     MeijuCloud,
     MideaAirCloud,
@@ -20,7 +20,7 @@ from midealocal.cloud import (
     get_midea_cloud,
     get_preset_account_cloud,
 )
-from midealocal.exceptions import ElementMissing
+from midealan.exceptions import ElementMissing
 
 
 class CloudTest(IsolatedAsyncioTestCase):
@@ -67,7 +67,7 @@ class CloudTest(IsolatedAsyncioTestCase):
         """Test get default cloud name without any default cloud."""
         with (
             patch.dict(
-                "midealocal.cloud.SUPPORTED_CLOUDS",
+                "midealan.cloud.SUPPORTED_CLOUDS",
                 {"NoDefault": {}},
                 clear=True,
             ),

@@ -5,7 +5,7 @@
     "--cov-report",
     "xml:cov.xml",
     "--cov",
-    "midealocal"
+    "midealan"
   ],
   "python.testing.pytestEnabled": true,
   "pylint.importStrategy": "fromEnvironment",

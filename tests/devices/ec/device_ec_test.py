@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.devices.ec import DeviceAttributes, MideaECDevice
-from midealocal.devices.ec.message import MessageECBase, MessageQuery
-from midealocal.message import ListTypes, MessageType
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.devices.ec import DeviceAttributes, MideaECDevice
+from midealan.devices.ec.message import MessageECBase, MessageQuery
+from midealan.message import ListTypes, MessageType
 
 
 class TestMideaECDevice:

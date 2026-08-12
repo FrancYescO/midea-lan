@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.e2.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.e2.message import (
     E2GeneralMessageBody,
     MessageE2Base,
     MessageE2Response,
@@ -12,7 +12,7 @@ from midealocal.devices.e2.message import (
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

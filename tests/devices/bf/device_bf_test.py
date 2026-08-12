@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.devices.bf import DeviceAttributes, MideaBFDevice
-from midealocal.devices.bf.message import MessageBFBase, MessageQuery, MessageSet
-from midealocal.message import ListTypes, MessageType
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.devices.bf import DeviceAttributes, MideaBFDevice
+from midealan.devices.bf.message import MessageBFBase, MessageQuery, MessageSet
+from midealan.message import ListTypes, MessageType
 
 
 class TestMideaBFDevice:

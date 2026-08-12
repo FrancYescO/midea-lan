@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ed.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.ed.message import (
     EDMessageBody01,
     EDMessageBody03,
     EDMessageBody05,
@@ -25,7 +25,7 @@ from midealocal.devices.ed.message import (
     MessageQuery09,
     MessageQueryFF,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageEDBase:

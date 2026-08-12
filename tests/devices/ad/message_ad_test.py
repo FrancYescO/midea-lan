@@ -2,13 +2,13 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ad.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.ad.message import (
     Message21Query,
     Message31Query,
     MessageADBase,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageADBase:

@@ -2,10 +2,10 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ea import DeviceAttributes, MideaEADevice
-from midealocal.devices.ea.message import MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.ea import DeviceAttributes, MideaEADevice
+from midealan.devices.ea.message import MessageQuery
+from midealan.message import MessageType
 
 PROTOCOL_NONE = 0x00
 

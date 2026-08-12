@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b6 import DeviceAttributes, MideaB6Device
-from midealocal.devices.b6.message import MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.b6 import DeviceAttributes, MideaB6Device
+from midealan.devices.b6.message import MessageQuery
+from midealan.message import MessageType
 
 
 def _build_message(

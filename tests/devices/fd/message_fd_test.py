@@ -2,15 +2,15 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.crc8 import calculate
-from midealocal.devices.fd.message import (
+from midealan.const import ProtocolVersion
+from midealan.crc8 import calculate
+from midealan.devices.fd.message import (
     MessageFDBase,
     MessageFDResponse,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

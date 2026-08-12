@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.a1.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.a1.message import (
     MessageA1Base,
     MessageA1Response,
     MessageNewProtocolQuery,
@@ -12,7 +12,7 @@ from midealocal.devices.a1.message import (
     MessageSet,
     NewProtocolTags,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageA1Base:

@@ -4,14 +4,14 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.cd import DeviceAttributes, LuaProtocol, MideaCDDevice
-from midealocal.devices.cd.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.cd import DeviceAttributes, LuaProtocol, MideaCDDevice
+from midealan.devices.cd.message import (
     MessageQuery,
     MessageQueryDaily,
     MessageQueryWeekly,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 def _make_device(model: str = "test_model", customize: str = "") -> MideaCDDevice:
@@ -236,7 +236,7 @@ class TestMideaCDDevice:
             auto_sterilize_minute = 168
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -257,7 +257,7 @@ class TestMideaCDDevice:
             auto_sterilize_minute = 5
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -519,7 +519,7 @@ class TestMideaCDDevice:
             mode = 8
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -534,7 +534,7 @@ class TestMideaCDDevice:
             max_temperature = "bad"
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -550,7 +550,7 @@ class TestMideaCDDevice:
             current_temperature = 0.0
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -565,7 +565,7 @@ class TestMideaCDDevice:
             disinfection_temperature = None
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = self.device.process_message(b"")
@@ -582,7 +582,7 @@ class TestMideaCDDevice:
             current_temperature = 110.0
 
         with patch(
-            "midealocal.devices.cd.MessageCDResponse",
+            "midealan.devices.cd.MessageCDResponse",
             return_value=FakeMessage(),
         ):
             status = device.process_message(b"")

@@ -4,11 +4,11 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.dc import DeviceAttributes, MideaDCDevice
-from midealocal.devices.dc.message import MessagePower, MessageQuery, MessageStart
-from midealocal.exceptions import ValueWrongType
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.dc import DeviceAttributes, MideaDCDevice
+from midealan.devices.dc.message import MessagePower, MessageQuery, MessageStart
+from midealan.exceptions import ValueWrongType
+from midealan.message import MessageType
 
 
 class TestMideaDCDevice:

@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b6.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.b6.message import (
     B6ExceptionBody,
     B6FeedbackBody,
     B6GeneralBody,
@@ -15,7 +15,7 @@ from midealocal.devices.b6.message import (
     MessageQueryTips,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def _build_message(

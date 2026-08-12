@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import DeviceType
-from midealocal.message import (
+from midealan.const import DeviceType
+from midealan.message import (
     BodyParser,
     BodyType,
     BoolParser,
@@ -427,7 +427,7 @@ class TestNewProtocolMessageBody:
     def test_parse_non_standard_short_body(self) -> None:
         """Test parse with a body too short to hold the param count.
 
-        Source quirk (midealocal/message.py:886-898): the IndexError handler
+        Source quirk (midealan/message.py:886-898): the IndexError handler
         leaves `param_count` unbound, so the debug log after the handler
         raises UnboundLocalError instead of returning an empty result.
         """

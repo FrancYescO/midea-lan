@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.c2 import DeviceAttributes, MideaC2Device
-from midealocal.devices.c2.message import MessagePower, MessageQuery, MessageSet
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.c2 import DeviceAttributes, MideaC2Device
+from midealan.devices.c2.message import MessagePower, MessageQuery, MessageSet
+from midealan.message import MessageType
 
 
 class TestMideaC2Device:

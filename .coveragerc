@@ -1,6 +1,6 @@
 [run]
 branch = true
-source = midealocal
+source = midealan
 omit =
     library_test.py
 

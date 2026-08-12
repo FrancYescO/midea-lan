@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.cc import DeviceAttributes, MideaCCDevice
-from midealocal.devices.cc.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.cc import DeviceAttributes, MideaCCDevice
+from midealan.devices.cc.message import (
     CCControlId,
     MessageFEControl,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

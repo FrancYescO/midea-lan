@@ -5,15 +5,15 @@ from hashlib import sha256
 import pytest
 from Crypto.Util.strxor import strxor
 
-from midealocal.const import MAX_DOUBLE_BYTE_VALUE
-from midealocal.exceptions import (
+from midealan.const import MAX_DOUBLE_BYTE_VALUE
+from midealan.exceptions import (
     CannotAuthenticate,
     DataSignDoesntMatch,
     DataSignWrongType,
     DataUnexpectedLength,
     MessageWrongFormat,
 )
-from midealocal.security import (
+from midealan.security import (
     MSGTYPE_ENCRYPTED_REQUEST,
     MSGTYPE_HANDSHAKE_REQUEST,
     CloudSecurity,

@@ -5,10 +5,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.fd import DeviceAttributes, MideaFDDevice
-from midealocal.devices.fd.message import MessageQuery, MessageSet
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.fd import DeviceAttributes, MideaFDDevice
+from midealan.devices.fd.message import MessageQuery, MessageSet
+from midealan.message import MessageType
 
 
 def _build_device(subtype: int) -> MideaFDDevice:
@@ -194,7 +194,7 @@ class TestMideaFDDevice:
         """
         response = SimpleNamespace(mode=10, fan_speed=999, screen_display=99)
         with patch(
-            "midealocal.devices.fd.MessageFDResponse",
+            "midealan.devices.fd.MessageFDResponse",
             return_value=response,
         ):
             new_status = self.device.process_message(b"")
@@ -211,7 +211,7 @@ class TestMideaFDDevice:
         """Test process message with an unhandled body type updates nothing."""
         body = bytearray(38)
         body[0] = 0xB0
-        with patch("midealocal.message.MessageResponse.set_attr") as mock_set_attr:
+        with patch("midealan.message.MessageResponse.set_attr") as mock_set_attr:
             new_status = self.device.process_message(
                 _build_message(MessageType.query, body),
             )

@@ -2,15 +2,15 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.x40.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.x40.message import (
     MessageQuery,
     MessageSet,
     MessageX40Base,
     MessageX40Body,
     MessageX40Response,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

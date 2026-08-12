@@ -1,13 +1,13 @@
-"""Midea Local device test."""
+"""Midea Lan device test."""
 
 from typing import ClassVar
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from midealocal.cloud import DEFAULT_KEYS
-from midealocal.const import DeviceType, ProtocolVersion
-from midealocal.device import (
+from midealan.cloud import DEFAULT_KEYS
+from midealan.const import DeviceType, ProtocolVersion
+from midealan.device import (
     MESSAGE_TYPE_INDEX,
     QUERY_TIMEOUT,
     RESPONSE_TIMEOUT,
@@ -16,8 +16,8 @@ from midealocal.device import (
     MideaDevice,
     NoSupportedProtocol,
 )
-from midealocal.exceptions import SocketException
-from midealocal.message import MessageType
+from midealan.exceptions import SocketException
+from midealan.message import MessageType
 
 
 class _DictDevice(MideaDevice):

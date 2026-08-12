@@ -40,7 +40,7 @@ lint.ignore = [
 "library_test.py" = [
     "PLR0915",  # Too many statements
 ]
-"midealocal/security.py" = [
+"midealan/security.py" = [
     "S324",     # Probable use of insecure hash functions in `hashlib`: `md5`
 ]
 "tests/*" = [

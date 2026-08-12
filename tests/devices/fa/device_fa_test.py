@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.fa import DeviceAttributes, MideaFADevice
-from midealocal.devices.fa.message import MessageQuery
-from midealocal.message import MessageType
+from midealan.const import ProtocolVersion
+from midealan.devices.fa import DeviceAttributes, MideaFADevice
+from midealan.devices.fa.message import MessageQuery
+from midealan.message import MessageType
 
 
 def _build_message(

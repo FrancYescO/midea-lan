@@ -2,9 +2,9 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.crc8 import calculate
-from midealocal.devices.cc.message import (
+from midealan.const import ProtocolVersion
+from midealan.crc8 import calculate
+from midealan.devices.cc.message import (
     CCControlId,
     CCGeneralMessageBody,
     MessageCCBase,
@@ -13,7 +13,7 @@ from midealocal.devices.cc.message import (
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestCCMessageBase:

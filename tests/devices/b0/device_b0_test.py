@@ -2,14 +2,14 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.b0 import DeviceAttributes, MideaB0Device
-from midealocal.devices.b0.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.b0 import DeviceAttributes, MideaB0Device
+from midealan.devices.b0.message import (
     MessageQuery00,
     MessageQuery01,
     MessageQuery31,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 def _build_device(subtype: int) -> MideaB0Device:

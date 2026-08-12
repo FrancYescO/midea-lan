@@ -2,8 +2,8 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ca.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.ca.message import (
     CAExceptionMessageBody,
     CAGeneralMessageBody,
     CANotify00MessageBody,
@@ -12,7 +12,7 @@ from midealocal.devices.ca.message import (
     MessageCAResponse,
     MessageQuery,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 def _build_message(message_type: MessageType, body: bytearray) -> bytes:

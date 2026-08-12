@@ -4,8 +4,8 @@ from typing import Any
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.cd.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.cd.message import (
     CD01MessageBody,
     CDDailyTimerBody,
     CDGeneralMessageBody,
@@ -20,7 +20,7 @@ from midealocal.devices.cd.message import (
     MessageSetSterilize,
     MessageSetWeekly,
 )
-from midealocal.message import ListTypes, MessageType
+from midealan.message import ListTypes, MessageType
 
 
 class TestMessageCDBase:

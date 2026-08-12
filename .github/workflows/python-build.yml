@@ -75,12 +75,12 @@ jobs:
         if: github.event_name != 'release'
         run: prek run --show-diff-on-failure --color=always --all-files
         shell: bash
-      - name: Build midea-local
+      - name: Build midea-lan
         run: python -m build
         shell: bash
       - name: Test with pytest
         run: |
-          python -m pytest --rootdir . --cov=midealocal --cov-report html --cov-report xml --junitxml=reports/junit/junit.xml ./tests/
+          python -m pytest --rootdir . --cov=midealan --cov-report html --cov-report xml --junitxml=reports/junit/junit.xml ./tests/
           mv htmlcov reports/coverage
         shell: bash
       - name: Upload coverage artifact
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/midea-local
+      url: https://pypi.org/p/midea-lan
     permissions:
       id-token: write
     steps:

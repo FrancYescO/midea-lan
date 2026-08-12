@@ -4,10 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ed import DeviceAttributes, MideaEDDevice
-from midealocal.devices.ed.message import MessageEDResponse
-from midealocal.message import ListTypes
+from midealan.const import ProtocolVersion
+from midealan.devices.ed import DeviceAttributes, MideaEDDevice
+from midealan.devices.ed.message import MessageEDResponse
+from midealan.message import ListTypes
 
 TEST_AUTH_VALUE = "AA"
 

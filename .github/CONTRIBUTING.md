@@ -11,16 +11,18 @@ GitHub Path: `.github/CONTRIBUTING.md`
 
 ## Table of Contents
 
-1. [Overview](#1-overview)
-2. [System Requirements](#2-system-requirements)
-3. [Install uv](#3-install-uv)
-4. [Quick Start](#4-quick-start)
-5. [Windows Users](#5-windows-users)
-6. [China Mainland Network Mirrors](#6-china-mainland-network-mirrors)
-7. [Common Commands](#7-common-commands)
-8. [Commit & Pull Request Workflow](#8-commit--pull-request-workflow)
-9. [Code Style, prek & Testing](#9-code-style-prek--testing)
-10. [Issues & Community Conduct](#10-issues--community-conduct)
+- [Contributing Guide (English Version)](#contributing-guide-english-version)
+  - [Table of Contents](#table-of-contents)
+  - [1. Overview](#1-overview)
+  - [2. System Requirements](#2-system-requirements)
+  - [3. Install uv](#3-install-uv)
+  - [4. Quick Start](#4-quick-start)
+  - [5. Windows Users](#5-windows-users)
+  - [6. China Mainland Network Mirrors](#6-china-mainland-network-mirrors)
+  - [7. Common Commands](#7-common-commands)
+  - [8. Commit \& Pull Request Workflow](#8-commit--pull-request-workflow)
+  - [9. Code Style, prek \& Testing](#9-code-style-prek--testing)
+  - [10. Issues \& Community Conduct](#10-issues--community-conduct)
 
 ---
 
@@ -73,8 +75,8 @@ Verify with `uv --version`.
 ## 4. Quick Start
 
 ```bash
-git clone https://github.com/midea-lan/midea-local.git
-cd midea-local
+git clone https://github.com/wuwentao/midea-lan.git
+cd midea-lan
 ./scripts/setup.sh          # Windows: scripts\setup.ps1
 ```
 
@@ -107,7 +109,7 @@ If you prefer WSL2:
 
 1. Enable it: `wsl --install -d Ubuntu` then `wsl --set-default-version 2`.
 2. Install uv **inside** WSL using the macOS/Linux command.
-3. Clone the repo inside the WSL Linux filesystem (e.g. `/home/<user>/midea-local`), not
+3. Clone the repo inside the WSL Linux filesystem (e.g. `/home/<user>/midea-lan`), not
    under `C:\`, to avoid performance and permission issues.
 
 ---
@@ -131,15 +133,15 @@ persist these in your shell profile.
 
 ## 7. Common Commands
 
-| Task                       | Command                                                                       |
-| -------------------------- | ----------------------------------------------------------------------------- |
-| Run all tests              | `uv run python -m pytest ./tests/`                                            |
-| Run one test file          | `uv run python -m pytest tests/devices/ac/message_ac_test.py`                 |
-| Coverage report            | `uv run python -m pytest --cov=midealocal --cov-report term-missing ./tests/` |
-| Lint / format / type-check | `uv run prek run --all-files`                                                 |
-| Ruff only                  | `uv run ruff check .` / `uv run ruff format .`                                |
-| Build the package          | `uv run python -m build`                                                      |
-| Add a dependency           | edit `requirements*.txt`, then `uv pip install -r requirements-all.txt`       |
+| Task                       | Command                                                                     |
+| -------------------------- | --------------------------------------------------------------------------- |
+| Run all tests              | `uv run python -m pytest ./tests/`                                          |
+| Run one test file          | `uv run python -m pytest tests/devices/ac/message_ac_test.py`               |
+| Coverage report            | `uv run python -m pytest --cov=midealan --cov-report term-missing ./tests/` |
+| Lint / format / type-check | `uv run prek run --all-files`                                               |
+| Ruff only                  | `uv run ruff check .` / `uv run ruff format .`                              |
+| Build the package          | `uv run python -m build`                                                    |
+| Add a dependency           | edit `requirements*.txt`, then `uv pip install -r requirements-all.txt`     |
 
 ---
 

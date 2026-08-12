@@ -2,9 +2,9 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.crc8 import calculate
-from midealocal.devices.ac.message import (
+from midealan.const import ProtocolVersion
+from midealan.crc8 import calculate
+from midealan.devices.ac.message import (
     MessageA0LongQuery,
     MessageA0Query,
     MessageACBase,
@@ -33,7 +33,7 @@ from midealocal.devices.ac.message import (
     NewProtocolTags,
     PowerFormats,
 )
-from midealocal.message import ListTypes, MessageBase, MessageType
+from midealan.message import ListTypes, MessageBase, MessageType
 
 
 class TestMessageACBase:

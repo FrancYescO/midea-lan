@@ -1,7 +1,7 @@
 """Midea local packet builder test."""
 
-from midealocal.packet_builder import PacketBuilder
-from midealocal.security import LocalSecurity
+from midealan.packet_builder import PacketBuilder
+from midealan.security import LocalSecurity
 
 
 class TestPacketBuilder:

@@ -140,4 +140,5 @@ reports/
 
 # Optional config file for library script
 library_test.json
-midea-local.json
+midea-lan.json
+.claude

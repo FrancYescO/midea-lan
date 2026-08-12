@@ -1,7 +1,7 @@
-# Midea-local Python 库
+# midea-lan Python 库
 
-[![Python build](https://github.com/midea-lan/midea-local/actions/workflows/python-build.yml/badge.svg)](https://github.com/midea-lan/midea-local/actions/workflows/python-build.yml)
-[![codecov](https://codecov.io/github/midea-lan/midea-local/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/midea-lan/midea-local)
+[![Python build](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml/badge.svg)](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml)
+[![codecov](https://codecov.io/github/wuwentao/midea-lan/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/wuwentao/midea-lan)
 
 > [English README](./README.md)
 
@@ -16,20 +16,20 @@
 ### 发现设备
 
 ```python3
-from midealocal.discover import discover
+from midealan.discover import discover
 # 未知 IP 地址时
 discover()
 # 已知 IP 地址时
 discover(ip_address="203.0.113.11")
-# 设备类型为十六进制，对应 midealocal/devices/TYPE
+# 设备类型为十六进制，对应 midealan/devices/TYPE
 type_code = hex(list(discover().values())[0]['type'])[2:]
 ```
 
 ### 从设备获取数据
 
 ```python3
-from midealocal.discover import discover
-from midealocal.devices import device_selector
+from midealan.discover import discover
+from midealan.devices import device_selector
 
 token = '...'
 key = '...'
@@ -65,7 +65,7 @@ ac.set_swing(False, False)
 ### 命令行工具
 
 ```python3
-python3 -m midealocal.cli -h
+python3 -m midealan.cli -h
 ```
 
 ## 开发环境
@@ -74,8 +74,8 @@ python3 -m midealocal.cli -h
 在[安装 uv](https://docs.astral.sh/uv/getting-started/installation/) 之后：
 
 ```bash
-git clone https://github.com/midea-lan/midea-local.git
-cd midea-local
+git clone https://github.com/wuwentao/midea-lan.git
+cd midea-lan
 ./scripts/setup.sh          # Linux / macOS / WSL2 （Windows 使用 scripts\setup.ps1）
 ```
 

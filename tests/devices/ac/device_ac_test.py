@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ac import DeviceAttributes, MideaACDevice
-from midealocal.devices.ac.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.ac import DeviceAttributes, MideaACDevice
+from midealan.devices.ac.message import (
     MessageCapabilitiesAdditionalQuery,
     MessageCapabilitiesQuery,
     MessageGroupOneQuery,
@@ -28,7 +28,7 @@ from midealocal.devices.ac.message import (
     NewProtocolTags,
     PowerFormats,
 )
-from midealocal.message import ListTypes, MessageBase
+from midealan.message import ListTypes, MessageBase
 
 
 class TestMideaACDevice:
@@ -115,7 +115,7 @@ class TestMideaACDevice:
         with (
             patch.object(self.device, "send_message_v2") as mock_build_send,
             patch(
-                "midealocal.devices.ac.MessageACResponse",
+                "midealan.devices.ac.MessageACResponse",
             ) as mock_message_response,
         ):
             self.device.set_attribute(DeviceAttributes.power.value, True)
@@ -528,7 +528,7 @@ class TestMideaACDevice:
 
     def test_process_message(self) -> None:
         """Test process message."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.prompt_tone = False
@@ -616,7 +616,7 @@ class TestMideaACDevice:
 
     def test_process_message_group_data(self) -> None:
         """Test that group 1/2/7 data is stored in the device attributes."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.power = True
@@ -712,7 +712,7 @@ class TestMideaACDevice:
         )
 
         with patch(
-            "midealocal.devices.ac.MessageACResponse",
+            "midealan.devices.ac.MessageACResponse",
             side_effect=[new_protocol_msg, stale_c0_msg],
         ):
             first = self.device.process_message(b"")
@@ -804,7 +804,7 @@ class TestMideaACDevice:
 
     def test_self_clean_syncs_from_self_clean_active(self) -> None:
         """Test that self_clean attribute tracks self_clean_active status reports."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.power = False
@@ -832,7 +832,7 @@ class TestMideaACDevice:
 
     def test_self_clean_ignores_stale_status_after_set(self) -> None:
         """Test stale self-clean status does not undo a pending command."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.power = False
@@ -851,7 +851,7 @@ class TestMideaACDevice:
 
             self.device._pending_self_clean = (True, 100.0)
             mock_message.self_clean_active = False
-            with patch("midealocal.devices.ac.time.monotonic", return_value=101.0):
+            with patch("midealan.devices.ac.time.monotonic", return_value=101.0):
                 result = self.device.process_message(b"")
 
             assert DeviceAttributes.self_clean.value not in result
@@ -859,7 +859,7 @@ class TestMideaACDevice:
             assert self.device._pending_self_clean == (True, 100.0)
 
             mock_message.self_clean_active = True
-            with patch("midealocal.devices.ac.time.monotonic", return_value=102.0):
+            with patch("midealan.devices.ac.time.monotonic", return_value=102.0):
                 result = self.device.process_message(b"")
 
             assert result[DeviceAttributes.self_clean.value] is True
@@ -868,7 +868,7 @@ class TestMideaACDevice:
 
     def test_self_clean_accepts_status_after_refresh_interval(self) -> None:
         """Test stale-status guard expires after the configured refresh interval."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.power = False
@@ -888,7 +888,7 @@ class TestMideaACDevice:
             self.device.set_refresh_interval(5)
             self.device._pending_self_clean = (True, 100.0)
             mock_message.self_clean_active = False
-            with patch("midealocal.devices.ac.time.monotonic", return_value=106.0):
+            with patch("midealan.devices.ac.time.monotonic", return_value=106.0):
                 result = self.device.process_message(b"")
 
             assert result[DeviceAttributes.self_clean.value] is False
@@ -897,7 +897,7 @@ class TestMideaACDevice:
 
     def test_self_clean_accepts_status_at_refresh_interval_boundary(self) -> None:
         """Test stale-status guard expires exactly at the refresh interval."""
-        with patch("midealocal.devices.ac.MessageACResponse") as mock_message_response:
+        with patch("midealan.devices.ac.MessageACResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.used_subprotocol = False
             mock_message.power = False
@@ -917,7 +917,7 @@ class TestMideaACDevice:
             self.device.set_refresh_interval(5)
             self.device._pending_self_clean = (True, 100.0)
             mock_message.self_clean_active = False
-            with patch("midealocal.devices.ac.time.monotonic", return_value=105.0):
+            with patch("midealan.devices.ac.time.monotonic", return_value=105.0):
                 result = self.device.process_message(b"")
 
             assert result[DeviceAttributes.self_clean.value] is False

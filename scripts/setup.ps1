@@ -1,4 +1,4 @@
-# Bootstrap the midea-local development environment with uv (Windows PowerShell).
+# Bootstrap the midea-lan development environment with uv (Windows PowerShell).
 #
 # Prerequisite: install uv first (https://docs.astral.sh/uv/getting-started/installation/):
 #   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"

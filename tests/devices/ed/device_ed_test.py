@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.ed import DeviceAttributes, MideaEDDevice
-from midealocal.devices.ed.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.ed import DeviceAttributes, MideaEDDevice
+from midealan.devices.ed.message import (
     MessageEDBase,
     MessageOldSet,
     MessageQuery,
@@ -59,7 +59,7 @@ class TestMideaEDDevice:
 
     def test_process_message(self) -> None:
         """Test process message."""
-        with patch("midealocal.devices.ed.MessageEDResponse") as mock_message_response:
+        with patch("midealan.devices.ed.MessageEDResponse") as mock_message_response:
             mock_message = mock_message_response.return_value
             mock_message.protocol_version = ProtocolVersion.V3
             mock_message.power = True
@@ -269,7 +269,7 @@ class TestMideaEDDevice:
         assert isinstance(queries[0], MessageQuery)
         assert DeviceAttributes.current_temperature not in other_model.attributes
 
-        with patch("midealocal.devices.ed.MessageEDResponse") as response:
+        with patch("midealan.devices.ed.MessageEDResponse") as response:
             other_model.process_message(b"")
         response.assert_called_once_with(b"", 0)
 
@@ -326,7 +326,7 @@ class TestMideaEDDevice:
             subtype=395,
             customize="",
         )
-        with patch("midealocal.devices.ed.MessageEDResponse") as response:
+        with patch("midealan.devices.ed.MessageEDResponse") as response:
             message = response.return_value
             message.target_temperature = 80
             message.heating = True

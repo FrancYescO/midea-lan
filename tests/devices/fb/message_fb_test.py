@@ -2,13 +2,13 @@
 
 import pytest
 
-from midealocal.const import ProtocolVersion
-from midealocal.devices.fb.message import (
+from midealan.const import ProtocolVersion
+from midealan.devices.fb.message import (
     MessageFBBase,
     MessageQuery,
     MessageSet,
 )
-from midealocal.message import MessageType
+from midealan.message import MessageType
 
 
 class TestMessageFBBase:

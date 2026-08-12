@@ -5,21 +5,21 @@
       "name": "Python Debugger: Discover",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": ["discover", "-d", "--host", "${input:host}"]
     },
     {
       "name": "Python Debugger: Decode message",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": ["decode", "-d", "${input:message}"]
     },
     {
       "name": "Python Debugger: Save config",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": [
         "save",
         "-d",
@@ -35,14 +35,14 @@
       "name": "Python Debugger: Download from host",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": ["download", "-d", "--host", "${input:host}"]
     },
     {
       "name": "Python Debugger: Download from sn and type",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": [
         "download",
         "-d",
@@ -56,7 +56,7 @@
       "name": "Python Debugger: Set device attribute",
       "type": "debugpy",
       "request": "launch",
-      "module": "midealocal.cli",
+      "module": "midealan.cli",
       "args": [
         "setattr",
         "-d",

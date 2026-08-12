@@ -11,16 +11,18 @@ GitHub 路径：`.github/CONTRIBUTING.zh.md`
 
 ## 目录
 
-1. [概述](#1-概述)
-2. [系统要求](#2-系统要求)
-3. [安装 uv](#3-安装-uv)
-4. [快速开始](#4-快速开始)
-5. [Windows 用户](#5-windows-用户)
-6. [中国大陆网络镜像](#6-中国大陆网络镜像)
-7. [常用命令](#7-常用命令)
-8. [提交与 Pull Request 工作流](#8-提交与-pull-request-工作流)
-9. [代码风格、prek 与测试](#9-代码风格prek-与测试)
-10. [问题反馈与社区行为规范](#10-问题反馈与社区行为规范)
+- [贡献指南（中文版）](#贡献指南中文版)
+  - [目录](#目录)
+  - [1. 概述](#1-概述)
+  - [2. 系统要求](#2-系统要求)
+  - [3. 安装 uv](#3-安装-uv)
+  - [4. 快速开始](#4-快速开始)
+  - [5. Windows 用户](#5-windows-用户)
+  - [6. 中国大陆网络镜像](#6-中国大陆网络镜像)
+  - [7. 常用命令](#7-常用命令)
+  - [8. 提交与 Pull Request 工作流](#8-提交与-pull-request-工作流)
+  - [9. 代码风格、prek 与测试](#9-代码风格prek-与测试)
+  - [10. 问题反馈与社区行为规范](#10-问题反馈与社区行为规范)
 
 ---
 
@@ -72,8 +74,8 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ## 4. 快速开始
 
 ```bash
-git clone https://github.com/midea-lan/midea-local.git
-cd midea-local
+git clone https://github.com/wuwentao/midea-lan.git
+cd midea-lan
 ./scripts/setup.sh          # Windows：scripts\setup.ps1
 ```
 
@@ -106,7 +108,7 @@ uv run prek install --hook-type commit-msg
 
 1. 启用：`wsl --install -d Ubuntu`，然后 `wsl --set-default-version 2`。
 2. 在 WSL **内部**使用 macOS/Linux 的命令安装 uv。
-3. 将仓库克隆到 WSL 的 Linux 文件系统内（例如 `/home/<user>/midea-local`），
+3. 将仓库克隆到 WSL 的 Linux 文件系统内（例如 `/home/<user>/midea-lan`），
    不要放在 `C:\` 下，以避免性能和权限问题。
 
 ---
@@ -129,15 +131,15 @@ export UV_PYTHON_INSTALL_MIRROR="https://mirror.nju.edu.cn/github-release/astral
 
 ## 7. 常用命令
 
-| 任务                     | 命令                                                                          |
-| ------------------------ | ----------------------------------------------------------------------------- |
-| 运行全部测试             | `uv run python -m pytest ./tests/`                                            |
-| 运行单个测试文件         | `uv run python -m pytest tests/devices/ac/message_ac_test.py`                 |
-| 覆盖率报告               | `uv run python -m pytest --cov=midealocal --cov-report term-missing ./tests/` |
-| 代码检查 / 格式化 / 类型 | `uv run prek run --all-files`                                                 |
-| 仅运行 Ruff              | `uv run ruff check .` / `uv run ruff format .`                                |
-| 构建软件包               | `uv run python -m build`                                                      |
-| 新增依赖                 | 编辑 `requirements*.txt`，再执行 `uv pip install -r requirements-all.txt`     |
+| 任务                     | 命令                                                                        |
+| ------------------------ | --------------------------------------------------------------------------- |
+| 运行全部测试             | `uv run python -m pytest ./tests/`                                          |
+| 运行单个测试文件         | `uv run python -m pytest tests/devices/ac/message_ac_test.py`               |
+| 覆盖率报告               | `uv run python -m pytest --cov=midealan --cov-report term-missing ./tests/` |
+| 代码检查 / 格式化 / 类型 | `uv run prek run --all-files`                                               |
+| 仅运行 Ruff              | `uv run ruff check .` / `uv run ruff format .`                              |
+| 构建软件包               | `uv run python -m build`                                                    |
+| 新增依赖                 | 编辑 `requirements*.txt`，再执行 `uv pip install -r requirements-all.txt`   |
 
 ---
 
