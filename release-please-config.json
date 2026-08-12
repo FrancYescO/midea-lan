@@ -1,5 +1,7 @@
 {
+  "bootstrap-sha": "1804c5ac6ed38f553beaf3a051730e611625712b",
   "include-commit-authors": true,
+  "include-v-in-tag": true,
   "packages": {
     ".": {
       "release-type": "python",
