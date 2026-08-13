@@ -2,7 +2,7 @@
 
 [![Python build](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml/badge.svg)](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml)
 [![Stable](https://img.shields.io/github/v/release/wuwentao/midea-lan)](https://github.com/wuwentao/midea-lan/releases/latest)
-[![codecov](https://codecov.io/github/midea-lan/midea-local/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/midea-lan/midea-local)
+[![codecov](https://codecov.io/gh/wuwentao/midea-lan/graph/badge.svg?token=MSM6KLLTYK)](https://codecov.io/gh/wuwentao/midea-lan)
 
 > [English README](./README.md)
 
@@ -66,7 +66,10 @@ ac.set_swing(False, False)
 ### 命令行工具
 
 ```python3
+# for local install without uv/venv
 python3 -m midealan.cli -h
+# for uv development venv
+uv run python -m midealan.cli -h
 ```
 
 ## 开发环境
