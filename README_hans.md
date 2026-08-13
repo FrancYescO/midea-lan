@@ -1,7 +1,8 @@
 # midea-lan Python 库
 
 [![Python build](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml/badge.svg)](https://github.com/wuwentao/midea-lan/actions/workflows/python-build.yml)
-[![codecov](https://codecov.io/github/wuwentao/midea-lan/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/wuwentao/midea-lan)
+[![Stable](https://img.shields.io/github/v/release/wuwentao/midea-lan)](https://github.com/wuwentao/midea-lan/releases/latest)
+[![codecov](https://codecov.io/github/midea-lan/midea-local/graph/badge.svg?token=8V0C1T2GJA)](https://codecov.io/github/midea-lan/midea-local)
 
 > [English README](./README.md)
 
