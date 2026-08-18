@@ -107,6 +107,7 @@ class MideaDevice(threading.Thread):
         self._ip_address = kwargs["ip_address"]
         self._port = kwargs["port"]
         self._security = LocalSecurity()
+        self._socket_lock = threading.RLock()
         self._token = bytes.fromhex(kwargs["token"])
         self._key = bytes.fromhex(kwargs["key"])
         self._buffer = b""
@@ -237,45 +238,55 @@ class MideaDevice(threading.Thread):
     def connect(self, check_protocol: bool = False) -> bool:
         """Connect to device."""
         connected = False
-        try:
-            self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._socket.settimeout(SOCKET_TIMEOUT)
-            _LOGGER.debug(
-                "[%s] Connecting to %s:%s",
-                self._device_id,
-                self._ip_address,
-                self._port,
-            )
-            self._socket.connect((self._ip_address, self._port))
-            _LOGGER.debug("[%s] Connected", self._device_id)
-            if self._device_protocol_version == ProtocolVersion.V3:
-                self.authenticate()
-            # 1. midea_ac_lan add device verify token with connect and auth
-            # 2. init connection, check_protocol
-            if check_protocol:
-                self.refresh_status(check_protocol=check_protocol)
-            connected = True
-        except TimeoutError:
-            _LOGGER.debug("[%s] Connection timed out", self._device_id)
-        except OSError:  # refresh_status exception
-            _LOGGER.debug("[%s] Connection error", self._device_id)
-        except AuthException:  # authenticate exception
-            _LOGGER.debug("[%s] Authentication failed", self._device_id)
-        except SocketException:  # refresh_status exception
-            _LOGGER.debug("[%s] Connect socket exception", self._device_id)
-        except NoSupportedProtocol:  # refresh_status exception
-            _LOGGER.debug("[%s] No supported query protocol", self._device_id)
-        except Exception as e:
-            _LOGGER.exception(
-                "[%s] Unknown error during connect device",
-                self._device_id,
-                exc_info=e,
-            )
-        finally:
-            # Any failure path leaves connected False; release the socket once
-            # here instead of repeating close_socket() in every handler.
-            if not connected:
-                self.close_socket()
+        sock: socket.socket | None = None
+        with self._socket_lock:
+            was_running = self._is_run
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._socket = sock
+                sock.settimeout(SOCKET_TIMEOUT)
+                _LOGGER.debug(
+                    "[%s] Connecting to %s:%s",
+                    self._device_id,
+                    self._ip_address,
+                    self._port,
+                )
+                sock.connect((self._ip_address, self._port))
+                _LOGGER.debug("[%s] Connected", self._device_id)
+                if self._device_protocol_version == ProtocolVersion.V3:
+                    self.authenticate()
+                # 1. midea_ac_lan add device verify token with connect and auth
+                # 2. init connection, check_protocol
+                if check_protocol:
+                    self.refresh_status(check_protocol=check_protocol)
+                if was_running and not self._is_run:
+                    _LOGGER.debug(
+                        "[%s] Connection closed before lifecycle completed",
+                        self._device_id,
+                    )
+                else:
+                    connected = True
+            except TimeoutError:
+                _LOGGER.debug("[%s] Connection timed out", self._device_id)
+            except OSError:  # refresh_status exception
+                _LOGGER.debug("[%s] Connection error", self._device_id)
+            except AuthException:  # authenticate exception
+                _LOGGER.warning("[%s] Authentication failed", self._device_id)
+            except SocketException:  # refresh_status exception
+                _LOGGER.debug("[%s] Connect socket exception", self._device_id)
+            except NoSupportedProtocol:  # refresh_status exception
+                _LOGGER.warning("[%s] No supported query protocol", self._device_id)
+            except Exception as e:
+                _LOGGER.exception(
+                    "[%s] Unknown error during connect device",
+                    self._device_id,
+                    exc_info=e,
+                )
+            finally:
+                # Any failure path leaves connected False; release the socket once
+                # here instead of repeating close_socket() in every handler.
+                if not connected and sock is not None:
+                    self.close_socket(sock)
         # enable/disable device in init connection
         if check_protocol:
             self.set_available(connected)
@@ -301,7 +312,7 @@ class MideaDevice(threading.Thread):
             response.hex(),
         )
         if len(response) < MIN_AUTH_RESPONSE:
-            _LOGGER.debug(
+            _LOGGER.warning(
                 "[%s] Received auth response len %d error, bytes: %s",
                 self._device_id,
                 len(response),
@@ -390,9 +401,9 @@ class MideaDevice(threading.Thread):
             cmds = [MessageQueryAppliance(self.device_type), *cmds]
         error_count = 0
         _LOGGER.debug(
-            "[%s] refresh_status with cmds: %s, check_protocol %s, \
-            device %s, type %s, model %s, subtype %s, device_protocol: %s, \
-            message_protocol %s, unsupported_protocol: %s",
+            "[%s] refresh_status with cmds: %s, check_protocol %s, "
+            "device %s, type %s, model %s, subtype %s, device_protocol: %s, "
+            "message_protocol %s, unsupported_protocol: %s",
             self._device_id,
             cmds,
             check_protocol,
@@ -462,7 +473,7 @@ class MideaDevice(threading.Thread):
                 error_count += 1
             # all the query failed
             if error_count == len(cmds):
-                _LOGGER.debug(
+                _LOGGER.warning(
                     "[%s] all the query cmds failed %s, please report bug",
                     self._device_id,
                     cmds,
@@ -604,7 +615,7 @@ class MideaDevice(threading.Thread):
             self.build_send(cmd)
         except OSError as e:
             _LOGGER.debug(
-                "[{%s] Interface send_command failure, %s, cmd_type: %s, cmd_body: %s",
+                "[%s] send_command failure, %s, cmd_type: %s, cmd_body: %s",
                 self._device_id,
                 repr(e),
                 cmd_type,
@@ -669,13 +680,17 @@ class MideaDevice(threading.Thread):
         """
         return self._is_run
 
-    def close_socket(self) -> None:
+    def close_socket(self, sock: socket.socket | None = None) -> None:
         """Close socket."""
-        self._unsupported_protocol = []
-        self._buffer = b""
-        if self._socket:
+        with self._socket_lock:
+            if sock is None:
+                sock = self._socket
+            if sock is None or self._socket is sock:
+                self._unsupported_protocol = []
+                self._buffer = b""
+        if sock is not None:
             try:
-                self._socket.shutdown(socket.SHUT_RDWR)
+                sock.shutdown(socket.SHUT_RDWR)
             except OSError as e:
                 # shutdown() raises ENOTCONN if the peer already went away;
                 # that's fine, we still close() below.
@@ -685,12 +700,16 @@ class MideaDevice(threading.Thread):
                     e,
                 )
             try:
-                self._socket.close()
+                sock.close()
                 _LOGGER.debug("[%s] Socket closed", self._device_id)
-            except OSError as e:
+            # catch OSError, AttributeError, ValueError to avoid race condition
+            except (OSError, AttributeError, ValueError) as e:
                 _LOGGER.debug("[%s] Error while closing socket: %s", self._device_id, e)
             finally:
-                self._socket = None
+                with self._socket_lock:
+                    # Avoid clearing a socket installed by a concurrent reconnect.
+                    if self._socket is sock:
+                        self._socket = None
 
     def set_ip_address(self, ip_address: str) -> None:
         """Set IP address."""
@@ -727,7 +746,6 @@ class MideaDevice(threading.Thread):
             # the while guard was evaluated, so skip opening a socket / network
             # I/O once teardown is in progress.
             if self._should_run() and self.connect(check_protocol=True) is False:
-                self.close_socket()
                 connection_retries += 1
                 # Sleep time with exponential backoff, maximum 600 seconds
                 sleep_time = min(5 * (2 ** (connection_retries - 1)), 600)
