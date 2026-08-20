@@ -825,10 +825,10 @@ class NewProtocolPackLength(IntEnum):
 class NewProtocolMessageBody(MessageBody):
     """New protocol message body."""
 
-    def __init__(self, body: bytearray, bt: int) -> None:
+    def __init__(self, body: bytearray, body_type: int) -> None:
         """Initialize new protocol message body."""
         super().__init__(body)
-        if bt == ListTypes.B5:
+        if body_type == ListTypes.B5:
             self._pack_len = NewProtocolPackLength.FOUR
         else:
             self._pack_len = NewProtocolPackLength.FIVE

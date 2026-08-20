@@ -1066,11 +1066,11 @@ class XBXMessageBody(NewProtocolMessageBody):
     def __init__(
         self,
         body: bytearray,
-        bt: int,
+        body_type: int,
         new_protocol_temperature: bool = False,
     ) -> None:
         """Initialize AC BX message body."""
-        super().__init__(body, bt)
+        super().__init__(body, body_type)
 
         params = self.parse()
         if NewProtocolTags.indirect_wind in params:
@@ -1109,7 +1109,7 @@ class XBXMessageBody(NewProtocolMessageBody):
             self.sound = params[NewProtocolTags.buzzer_all][0] > 0
         if NewProtocolTags.error_code_query in params:
             self.error_code = params[NewProtocolTags.error_code_query][0]
-        if NewProtocolTags.self_clean in params and bt != ListTypes.B5:
+        if NewProtocolTags.self_clean in params and body_type != ListTypes.B5:
             # A B5 body carries this tag as a capability flag (always 1 when the
             # model supports self-clean), so only B0/B1 bodies report live state.
             self.self_clean_active: bool = params[NewProtocolTags.self_clean][0] > 0
@@ -1182,9 +1182,9 @@ class XBXMessageBody(NewProtocolMessageBody):
 class XB5MessageBody(NewProtocolMessageBody):
     """AC B5 message body. body[0] b5, body[1] propertyNumber, cursor 2."""
 
-    def __init__(self, body: bytearray, bt: int) -> None:
+    def __init__(self, body: bytearray, body_type: int) -> None:
         """Initialize AC BX message body."""
-        super().__init__(body, bt)
+        super().__init__(body, body_type)
 
         params = self.parse()
         # parse b5 protocol, github issue https://github.com/wuwentao/midea_ac_lan/issues/673

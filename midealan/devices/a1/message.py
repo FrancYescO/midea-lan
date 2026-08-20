@@ -243,9 +243,9 @@ class A1GeneralMessageBody(MessageBody):
 class A1NewProtocolMessageBody(NewProtocolMessageBody):
     """A1 new protocol message body."""
 
-    def __init__(self, body: bytearray, bt: int) -> None:
+    def __init__(self, body: bytearray, body_type: int) -> None:
         """Initialize A1 new protocol message body."""
-        super().__init__(body, bt)
+        super().__init__(body, body_type)
         params = self.parse()
         if NewProtocolTags.light in params:
             self.light = params[NewProtocolTags.light][0] > 0
