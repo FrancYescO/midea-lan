@@ -1066,11 +1066,10 @@ class PropertiesBody(NewProtocolMessageBody):
     def __init__(
         self,
         body: bytearray,
-        bt: int,
         new_protocol_temperature: bool = False,
     ) -> None:
-        """Initialize AC Bx message body."""
-        super().__init__(body, bt)
+        """Initialize AC BX message body."""
+        super().__init__(body)
 
         params = self.parse()
         if NewProtocolTags.indirect_wind in params:
@@ -1109,7 +1108,7 @@ class PropertiesBody(NewProtocolMessageBody):
             self.sound = params[NewProtocolTags.buzzer_all][0] > 0
         if NewProtocolTags.error_code_query in params:
             self.error_code = params[NewProtocolTags.error_code_query][0]
-        if NewProtocolTags.self_clean in params and bt != ListTypes.B5:
+        if NewProtocolTags.self_clean in params and self.body_type != ListTypes.B5:
             # A B5 body carries this tag as a capability flag (always 1 when the
             # model supports self-clean), so only B0/B1 bodies report live state.
             self.self_clean_active: bool = params[NewProtocolTags.self_clean][0] > 0
@@ -1182,9 +1181,9 @@ class PropertiesBody(NewProtocolMessageBody):
 class CapabilityBody(NewProtocolMessageBody):
     """AC B5 capability response body. body[0] b5, body[1] propertyNumber."""
 
-    def __init__(self, body: bytearray, bt: int) -> None:
+    def __init__(self, body: bytearray) -> None:
         """Initialize AC B5 capability response message body."""
-        super().__init__(body, bt)
+        super().__init__(body)
 
         params = self.parse()
         # parse b5 protocol, github issue https://github.com/wuwentao/midea_ac_lan/issues/673
@@ -1598,7 +1597,7 @@ class MessageACResponse(MessageResponse):
         # parse CapabilitiesQuery/CapabilitiesAdditionalQuery response
         # dataType 0x03 and messageBytes[0] 0xB5
         elif self.message_type == MessageType.query and self.body_type == ListTypes.B5:
-            self.set_body(CapabilityBody(super().body, self.body_type))
+            self.set_body(CapabilityBody(super().body))
         # dataType 0x05 and messageBytes[0] 0xB5
         # dataType 0x02 and messageBytes[0] 0xB0 (set result Unidentified protocol)
         # dataType 0x03 and messageBytes[0] 0xB1
@@ -1608,11 +1607,7 @@ class MessageACResponse(MessageResponse):
             MessageType.notify2,
         ] and self.body_type in [ListTypes.B0, ListTypes.B1, ListTypes.B5]:
             self.set_body(
-                PropertiesBody(
-                    super().body,
-                    self.body_type,
-                    new_protocol_temperature,
-                ),
+                PropertiesBody(super().body, new_protocol_temperature),
             )
         # dataType 0x02 and messageBytes[0] 0xC0
         # dataType 0x03 and messageBytes[0] 0xC0
