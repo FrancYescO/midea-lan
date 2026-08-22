@@ -484,21 +484,22 @@ class MeijuCloud(MideaCloud):
                     endpoint="/v2/iot/secure/getToken",
                     data=data,
                 )
+                # Log only the entry count: the payload carries token/key material.
+                tokens = (response or {}).get("tokenlist") or []
                 _LOGGER.debug(
-                    "Response from get_cloud_keys() for appliance_id %s "
-                    "in home %s with method %s: %s",
+                    "get_cloud_keys() v2 for appliance_id %s in home %s "
+                    "with method %s returned %s token entries",
                     appliance_id,
                     home_id,
                     method,
-                    response,
+                    len(tokens),
                 )
-                if response and "tokenlist" in response:
-                    for token in response["tokenlist"]:
-                        if token["udpId"] == udp_id:
-                            result[method] = {
-                                "token": token["token"].lower(),
-                                "key": token["key"].lower(),
-                            }
+                for token in tokens:
+                    if token["udpId"] == udp_id:
+                        result[method] = {
+                            "token": token["token"].lower(),
+                            "key": token["key"].lower(),
+                        }
             if result:
                 break
         if not result:
