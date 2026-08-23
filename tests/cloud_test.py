@@ -1,5 +1,6 @@
 """Test cloud."""
 
+import json
 from hashlib import md5
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -23,6 +24,22 @@ from midealan.cloud import (
     get_preset_account_cloud,
 )
 from midealan.exceptions import ElementMissing
+
+
+def _token_requests(session: Mock) -> list[tuple[str, dict]]:
+    """Return (url, payload) for every getToken request the client actually sent.
+
+    The response side_effect only controls what comes back; these assertions
+    pin down what goes out, so a regression to the v1 endpoint or to a
+    string-valued ``applianceCodes`` cannot pass silently.
+    """
+    out = []
+    for call in session.request.await_args_list:
+        url = call.args[1] if len(call.args) > 1 else call.kwargs.get("url", "")
+        if "getToken" not in url:
+            continue
+        out.append((url, json.loads(call.kwargs["data"])))
+    return out
 
 
 class CloudTest(IsolatedAsyncioTestCase):
@@ -264,6 +281,16 @@ class CloudTest(IsolatedAsyncioTestCase):
         assert len(keys) == 1
         assert keys == DEFAULT_KEYS
 
+        # Pin the outbound contract: every lookup must hit v2 and send
+        # homegroupId + udpid + a list-valued applianceCodes.
+        requests = _token_requests(session)
+        assert requests
+        for url, payload in requests:
+            assert url.endswith("/v2/iot/secure/getToken")
+            assert payload["homegroupId"]
+            assert payload["udpid"]
+            assert payload["applianceCodes"] == ["100"]
+
     async def test_meijucloud_get_keys_v2_fallback_to_v1(self) -> None:
         """Test MeijuCloud falls back to the v1 endpoint when v2 returns nothing."""
         session = Mock()
@@ -298,6 +325,18 @@ class CloudTest(IsolatedAsyncioTestCase):
         assert keys[2]["key"] == "method2_return_key2"
         assert len(keys) == 2
 
+        # v2 is tried for both homes x both methods, then v1 once per method.
+        requests = _token_requests(session)
+        v2 = [r for r in requests if r[0].endswith("/v2/iot/secure/getToken")]
+        v1 = [r for r in requests if r[0].endswith("/v1/iot/secure/getToken")]
+        assert len(v2) == 4
+        assert len(v1) == 2
+        for _url, payload in v2:
+            assert payload["applianceCodes"] == ["100"]
+        for _url, payload in v1:
+            # the inherited v1 implementation sends the plain string form
+            assert payload["applianceCodes"] == "100"
+
     async def test_meijucloud_get_keys_no_home(self) -> None:
         """Test MeijuCloud get_cloud_keys when the home list is unavailable."""
         session = Mock()
@@ -323,6 +362,12 @@ class CloudTest(IsolatedAsyncioTestCase):
         keys: dict = await cloud.get_cloud_keys(100)
         assert keys[1]["token"] == "method1_return_token1"
         assert len(keys) == 1
+
+        # No home list means v2 is skipped entirely; only v1 is called.
+        requests = _token_requests(session)
+        assert requests
+        for url, _payload in requests:
+            assert url.endswith("/v1/iot/secure/getToken")
 
     async def test_meijucloud_list_home(self) -> None:
         """Test MeijuCloud list_home."""
