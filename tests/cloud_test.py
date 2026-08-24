@@ -25,6 +25,14 @@ from midealan.cloud import (
 )
 from midealan.exceptions import ElementMissing
 
+# ``CloudSecurity.get_udp_id(100, method)``. Hard-coded on purpose: deriving them
+# with the same helper the implementation calls would not catch a request that
+# sends the wrong method's UDP ID.
+UDP_IDS = {
+    1: "dec4da86e0aeefadde14a4e553680b9b",
+    2: "b2dd199071d527a33c8239833a5bf5fb",
+}
+
 
 def _token_requests(session: Mock) -> list[tuple[str, dict]]:
     """Return (url, payload) for every getToken request the client actually sent.
@@ -287,9 +295,13 @@ class CloudTest(IsolatedAsyncioTestCase):
         assert requests
         for url, payload in requests:
             assert url.endswith("/v2/iot/secure/getToken")
-            assert payload["homegroupId"]
-            assert payload["udpid"]
             assert payload["applianceCodes"] == ["100"]
+        # Each of the three lookups stops at the first home that returns a key,
+        # so the exact sequence is home "1" x method 1, method 2 -- three times.
+        assert [(p["homegroupId"], p["udpid"]) for _url, p in requests] == [
+            ("1", UDP_IDS[1]),
+            ("1", UDP_IDS[2]),
+        ] * 3
 
     async def test_meijucloud_get_keys_v2_fallback_to_v1(self) -> None:
         """Test MeijuCloud falls back to the v1 endpoint when v2 returns nothing."""
@@ -329,13 +341,21 @@ class CloudTest(IsolatedAsyncioTestCase):
         requests = _token_requests(session)
         v2 = [r for r in requests if r[0].endswith("/v2/iot/secure/getToken")]
         v1 = [r for r in requests if r[0].endswith("/v1/iot/secure/getToken")]
-        assert len(v2) == 4
-        assert len(v1) == 2
         for _url, payload in v2:
             assert payload["applianceCodes"] == ["100"]
         for _url, payload in v1:
             # the inherited v1 implementation sends the plain string form
             assert payload["applianceCodes"] == "100"
+        # Both homes are tried, each with both methods, in order.
+        assert [(p["homegroupId"], p["udpid"]) for _url, p in v2] == [
+            ("1", UDP_IDS[1]),
+            ("1", UDP_IDS[2]),
+            ("2", UDP_IDS[1]),
+            ("2", UDP_IDS[2]),
+        ]
+        # v1 keeps the method-specific UDP ID but carries no home.
+        assert [p["udpid"] for _url, p in v1] == [UDP_IDS[1], UDP_IDS[2]]
+        assert all("homegroupId" not in p for _url, p in v1)
 
     async def test_meijucloud_get_keys_no_home(self) -> None:
         """Test MeijuCloud get_cloud_keys when the home list is unavailable."""
