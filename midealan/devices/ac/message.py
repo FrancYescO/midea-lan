@@ -185,23 +185,23 @@ class NewProtocolTags(IntEnum):
     ieco_switch = 0x00E3
     pre_cool_hot = 0x0201
     pm25_value = 0x020B
-    b5_wind_speed = 0x0210
-    b5_eco = 0x0212
+    wind_speed = 0x0210
+    eco = 0x0212
     b5_8_heat = 0x0213
     # b5 device
-    b5_mode = 0x0214
-    b5_wind_swing = 0x0215
-    b5_electricity = 0x0216
-    b5_filter_remind = 0x0217
-    b5_ptc = 0x0219
-    b5_strong_wind = 0x021A
+    mode = 0x0214
+    wind_swing = 0x0215
+    electricity = 0x0216
+    filter_remind = 0x0217
+    ptc = 0x0219
+    strong_wind = 0x021A
     little_angel = 0x021B
-    b5_anion = 0x021E
-    b5_humidity = 0x021F
-    b5_filter_check = 0x0221
+    anion = 0x021E
+    humidity = 0x021F
+    filter_check = 0x0221
     b5_fahrenheit = 0x0222
-    b5_screen_display = 0x0224
-    b5_temperature = 0x0225
+    b5_screen_display = 0x0224  # two screen display tags, 0x0017 and 0x0224
+    temperature = 0x0225
     auto_prevent_straight_wind = 0x0226
     remote_control_lock = 0x0227  # power_lock?
     operating_time = 0x0228
@@ -472,7 +472,7 @@ class NewProtocolQuery(MessageACBase):
         """Initialize AC message new protocol query.
 
         `supports_rate_select` gates the rate_select (0x0048) query param on
-        the device having advertised it via the B5 b5_electricity capability
+        the device having advertised it via the B5 electricity capability
         (tag 0x0216). Devices that don't report it never answer the query, so
         it's left out until support is confirmed.
         """
@@ -1193,39 +1193,38 @@ class CapabilityBody(NewProtocolMessageBody):
 
         params = self.parse()
         # parse b5 protocol, github issue https://github.com/wuwentao/midea_ac_lan/issues/673
-        if NewProtocolTags.b5_mode in params:
-            self.b5_mode = params[NewProtocolTags.b5_mode][0]
-        if NewProtocolTags.b5_anion in params:
-            self.b5_anion = params[NewProtocolTags.b5_anion][0]
-        if NewProtocolTags.b5_filter_remind in params:
-            self.b5_filter_remind = params[NewProtocolTags.b5_filter_remind][0]
-        if NewProtocolTags.b5_strong_wind in params:
-            self.b5_strong_wind = params[NewProtocolTags.b5_strong_wind][0]
-        if NewProtocolTags.b5_wind_speed in params:
-            self.b5_wind_speed = params[NewProtocolTags.b5_wind_speed][0]
-        if NewProtocolTags.b5_temperature in params:
-            self.b5_temperature0 = params[NewProtocolTags.b5_temperature][0]
-            self.b5_temperature1 = params[NewProtocolTags.b5_temperature][1]
-            self.b5_temperature2 = params[NewProtocolTags.b5_temperature][2]
-            self.b5_temperature3 = params[NewProtocolTags.b5_temperature][3]
-            self.b5_temperature4 = params[NewProtocolTags.b5_temperature][4]
-            self.b5_temperature5 = params[NewProtocolTags.b5_temperature][5]
-            self.b5_temperature6 = params[NewProtocolTags.b5_temperature][6]
+        if NewProtocolTags.mode in params:
+            self.mode = params[NewProtocolTags.mode][0]
+        if NewProtocolTags.anion in params:
+            self.anion = params[NewProtocolTags.anion][0]
+        if NewProtocolTags.filter_remind in params:
+            self.filter_remind = params[NewProtocolTags.filter_remind][0]
+        if NewProtocolTags.strong_wind in params:
+            self.strong_wind = params[NewProtocolTags.strong_wind][0]
+        if NewProtocolTags.wind_speed in params:
+            self.wind_speed = params[NewProtocolTags.wind_speed][0]
+        if NewProtocolTags.temperature in params:
+            b5_temperature0 = params[NewProtocolTags.temperature][0]
+            b5_temperature1 = params[NewProtocolTags.temperature][1]
+            b5_temperature2 = params[NewProtocolTags.temperature][2]
+            b5_temperature3 = params[NewProtocolTags.temperature][3]
+            b5_temperature4 = params[NewProtocolTags.temperature][4]
+            b5_temperature5 = params[NewProtocolTags.temperature][5]
             # per-mode setpoint limits in 0.5 C units. the six raw bytes are
             # cool then auto then heat, each a min then a max, plus a flag byte.
             # keyed by mode value: auto is 1, cool 2, dry 3, heat 4, fan 5
             # (dry and fan reuse the cool range).
-            cool = (self.b5_temperature0 / 2, self.b5_temperature1 / 2)
-            auto = (self.b5_temperature2 / 2, self.b5_temperature3 / 2)
-            heat = (self.b5_temperature4 / 2, self.b5_temperature5 / 2)
+            cool = (b5_temperature0 / 2, b5_temperature1 / 2)
+            auto = (b5_temperature2 / 2, b5_temperature3 / 2)
+            heat = (b5_temperature4 / 2, b5_temperature5 / 2)
             self.temperature_limits = {1: auto, 2: cool, 3: cool, 4: heat, 5: cool}
         if NewProtocolTags.b5_screen_display in params:
             self.b5_screen_display = params[NewProtocolTags.b5_screen_display][0]
         if NewProtocolTags.buzzer_all in params:
             # b5_sound/buzzer_all
             self.b5_sound = params[NewProtocolTags.buzzer_all][0]
-        if NewProtocolTags.b5_humidity in params:
-            self.b5_humidity = params[NewProtocolTags.b5_humidity][0]
+        if NewProtocolTags.humidity in params:
+            self.humidity = params[NewProtocolTags.humidity][0]
         self._parse_capabilities(params)
 
     def _parse_capabilities(self, params: dict[int, bytearray]) -> None:
@@ -1236,18 +1235,18 @@ class CapabilityBody(NewProtocolMessageBody):
         project). Only capabilities actually reported are added.
         """
         caps: dict[str, bool] = {}
-        if NewProtocolTags.b5_mode in params:
-            value = params[NewProtocolTags.b5_mode][0]
+        if NewProtocolTags.mode in params:
+            value = params[NewProtocolTags.mode][0]
             caps["heat_mode"] = value in B5_HEAT_MODE_VALUES
             caps["cool_mode"] = value not in B5_NO_COOL_MODE_VALUES
             caps["dry_mode"] = value in B5_DRY_MODE_VALUES
             caps["auto_mode"] = value in B5_AUTO_MODE_VALUES
-        if NewProtocolTags.b5_wind_swing in params:
-            value = params[NewProtocolTags.b5_wind_swing][0]
+        if NewProtocolTags.wind_swing in params:
+            value = params[NewProtocolTags.wind_swing][0]
             caps["swing_horizontal"] = value in B5_SWING_HORIZONTAL_VALUES
             caps["swing_vertical"] = value < B5_LOW_VALUE_MAX
-        if NewProtocolTags.b5_wind_speed in params:
-            value = params[NewProtocolTags.b5_wind_speed][0]
+        if NewProtocolTags.wind_speed in params:
+            value = params[NewProtocolTags.wind_speed][0]
             fan_custom = value == B5_FAN_CUSTOM_VALUE
             caps["fan_silent"] = fan_custom or value in B5_FAN_SILENT_VALUES
             caps["fan_low"] = fan_custom or value in B5_FAN_LOW_HIGH_VALUES
@@ -1255,19 +1254,19 @@ class CapabilityBody(NewProtocolMessageBody):
             caps["fan_high"] = fan_custom or value in B5_FAN_LOW_HIGH_VALUES
             caps["fan_auto"] = fan_custom or value in B5_FAN_AUTO_VALUES
             caps["fan_custom"] = fan_custom
-        if NewProtocolTags.b5_eco in params:
-            caps["eco"] = params[NewProtocolTags.b5_eco][0] in B5_ECO_VALUES
-        if NewProtocolTags.b5_anion in params:
-            caps["anion"] = params[NewProtocolTags.b5_anion][0] == B5_ANION_ON_VALUE
-        if NewProtocolTags.b5_strong_wind in params:
-            value = params[NewProtocolTags.b5_strong_wind][0]
+        if NewProtocolTags.eco in params:
+            caps["eco"] = params[NewProtocolTags.eco][0] in B5_ECO_VALUES
+        if NewProtocolTags.anion in params:
+            caps["anion"] = params[NewProtocolTags.anion][0] == B5_ANION_ON_VALUE
+        if NewProtocolTags.strong_wind in params:
+            value = params[NewProtocolTags.strong_wind][0]
             caps["turbo_cool"] = value < B5_LOW_VALUE_MAX
             caps["turbo_heat"] = value in B5_TURBO_HEAT_VALUES
         if NewProtocolTags.b5_screen_display in params:
             value = params[NewProtocolTags.b5_screen_display][0]
             caps["display_control"] = value in B5_DISPLAY_VALUES
-        if NewProtocolTags.b5_electricity in params:
-            value = params[NewProtocolTags.b5_electricity][0]
+        if NewProtocolTags.electricity in params:
+            value = params[NewProtocolTags.electricity][0]
             caps["rate_select"] = value > B5_ELECTRICITY_UNSUPPORTED_VALUE
         self.capabilities = caps
 

@@ -963,26 +963,22 @@ class TestMessageACResponse:
         body += bytearray(1)  # trailing checksum byte (stripped by MessageResponse)
 
         response = MessageACResponse(self.header + body)
-        assert hasattr(response, "b5_mode")
-        assert response.b5_mode == 7
-        assert hasattr(response, "b5_anion")
-        assert response.b5_anion == 1
-        assert hasattr(response, "b5_filter_remind")
-        assert response.b5_filter_remind == 1
-        assert hasattr(response, "b5_strong_wind")
-        assert response.b5_strong_wind == 1
-        assert hasattr(response, "b5_wind_speed")
-        assert response.b5_wind_speed == 5
+        assert hasattr(response, "mode")
+        assert response.mode == 7
+        assert hasattr(response, "anion")
+        assert response.anion == 1
+        assert hasattr(response, "filter_remind")
+        assert response.filter_remind == 1
+        assert hasattr(response, "strong_wind")
+        assert response.strong_wind == 1
+        assert hasattr(response, "wind_speed")
+        assert response.wind_speed == 5
         assert hasattr(response, "b5_screen_display")
         assert response.b5_screen_display == 1
         assert hasattr(response, "b5_sound")
         assert response.b5_sound == 1
-        assert hasattr(response, "b5_humidity")
-        assert response.b5_humidity == 1
-        assert hasattr(response, "b5_temperature0")
-        assert response.b5_temperature0 == 34
-        assert hasattr(response, "b5_temperature6")
-        assert response.b5_temperature6 == 0
+        assert hasattr(response, "humidity")
+        assert response.humidity == 1
         assert hasattr(response, "temperature_limits")
         assert response.temperature_limits == {
             1: (17.0, 30.0),
