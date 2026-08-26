@@ -7,6 +7,7 @@ from typing import Any, ClassVar, Unpack
 
 from midealan.const import DeviceType
 from midealan.device import MideaDevice, MideaDeviceInitKwargs
+from midealan.message import MessageType
 
 from .message import (
     MessageCDBase,
@@ -253,6 +254,14 @@ class MideaCDDevice(MideaDevice):
         message = MessageCDResponse(msg)
         _LOGGER.debug("[%s] Received: %s", self.device_id, message)
         new_status: dict[str, Any] = {}
+        # SET echoes are known to carry junk in several body positions (see the
+        # openPTC/Tr and mode-echo notes below).  Treat the "power" bit from a
+        # SET echo as untrusted: a spurious power=0 echo must not overwrite a
+        # good ON reading, because the stored power is later replayed into every
+        # temperature/mode control frame and would silently switch the unit off
+        # (see midea_ac_lan#768).  Genuine status/notify/query frames still
+        # update power normally.  Unknown/mocked messages keep prior behaviour.
+        is_set_echo = getattr(message, "message_type", None) == MessageType.set
         if hasattr(message, "fields"):
             self._fields = message.fields
         # parse fahrenheit switch for temperature value
@@ -358,6 +367,12 @@ class MideaCDDevice(MideaDevice):
                         else:
                             self._attributes[attr] = None
                             new_status[str(attr)] = None
+                    continue
+                # Do not let a SET echo clobber the trusted power state; a
+                # bogus power=0 echo would be replayed as an OFF command on the
+                # next temperature/mode write (midea_ac_lan#768).
+                if attr == DeviceAttributes.power and is_set_echo:
+                    new_status[str(attr)] = self._attributes[attr]
                     continue
                 # non-temperature attributes
                 self._attributes[attr] = raw_value
@@ -495,6 +510,13 @@ class MideaCDDevice(MideaDevice):
 
             elif attr == DeviceAttributes.power:
                 message.power = bool(value)
+                # Persist the explicitly requested power state now.  The
+                # process_message SET-echo guard distrusts the power bit from
+                # echoes, so without this the user's power request would not be
+                # stored until the next genuine status frame; a temperature or
+                # mode write in that window would read the stale value and
+                # replay it as an OFF command (midea_ac_lan#768).
+                self._attributes[DeviceAttributes.power] = bool(value)
 
             elif attr == DeviceAttributes.target_temperature:
                 message.target_temperature = float(value)
