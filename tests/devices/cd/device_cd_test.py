@@ -8,8 +8,11 @@ from midealan.const import ProtocolVersion
 from midealan.devices.cd import DeviceAttributes, LuaProtocol, MideaCDDevice
 from midealan.devices.cd.message import (
     MessageQuery,
+    MessageQueryB1,
     MessageQueryDaily,
     MessageQueryWeekly,
+    MessageSetMaintenance,
+    MessageSetSterilize,
 )
 from midealan.message import MessageType
 
@@ -825,3 +828,67 @@ class TestMideaCDDevice:
         """RSJRAC01 resolves the auto lua protocol to new."""
         device = _make_device(model="RSJRAC01")
         assert device._lua_protocol == LuaProtocol.new
+
+
+class TestMideaCDExtendedDevice:
+    """Extended controls are enabled by reported protocol capabilities."""
+
+    @pytest.fixture(autouse=True)
+    def _setup_device(self) -> None:
+        """Create a generic CD and mark it extended through reported limits."""
+        self.device = _make_device()
+        self.device._attributes[DeviceAttributes.max_temperature_lower_limit] = 35.0
+        self.device._attributes[DeviceAttributes.max_temperature_upper_limit] = 70.0
+
+    def test_official_mode_names_and_b1_query(self) -> None:
+        """Capabilities expose NetHome mode labels and the B1 query."""
+        assert self.device.preset_modes == [
+            "Economy",
+            "Hybrid",
+            "E-Heater",
+            "Smart",
+        ]
+        queries = self.device.build_query()
+        assert len(queries) == 4
+        assert isinstance(queries[-1], MessageQueryB1)
+
+    def test_disinfection_write_uses_extended_payload(self) -> None:
+        """Immediate disinfection preserves schedule and setpoint."""
+        self.device._attributes[DeviceAttributes.disinfection_temperature] = 67.0
+        self.device._attributes[DeviceAttributes.auto_sterilize_week] = 4
+        self.device._attributes[DeviceAttributes.auto_sterilize_hour] = 14
+        self.device._attributes[DeviceAttributes.auto_sterilize_minute] = 5
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.disinfect.value, True)
+        message = mock_send.call_args.args[0]
+        assert isinstance(message, MessageSetSterilize)
+        assert message.body == bytearray([0x06, 0x01, 0x80, 4, 14, 5, 67])
+
+    def test_max_temperature_is_clamped_to_reported_limit(self) -> None:
+        """Maximum target temperature uses BasicControl byte 23."""
+        self.device._attributes[DeviceAttributes.max_temperature_lower_limit] = 40.0
+        self.device._attributes[DeviceAttributes.max_temperature_upper_limit] = 68.0
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.max_temperature.value, 75.0)
+        message = mock_send.call_args.args[0]
+        assert message.body[23] == 68
+
+    def test_maintenance_preserves_b1_flags(self) -> None:
+        """Maintenance B0 control preserves priority, warning and reserved bits."""
+        self.device._attributes[DeviceAttributes.b0_reserved_flags] = 0x18
+        self.device._attributes[DeviceAttributes.ac_heater_priority] = True
+        self.device._attributes[DeviceAttributes.high_temp_reminder] = True
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(
+                DeviceAttributes.maintenance_reminder.value,
+                False,
+            )
+        message = mock_send.call_args.args[0]
+        assert isinstance(message, MessageSetMaintenance)
+        assert message.body[5] == 0x1B
+
+    def test_auto_disinfect_remains_read_only(self) -> None:
+        """Automatic disinfection status is not exposed as an invented toggle."""
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.auto_disinfect.value, True)
+        mock_send.assert_not_called()
