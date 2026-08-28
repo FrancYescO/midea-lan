@@ -556,6 +556,23 @@ class MessageQueryAppliance(MessageRequest):
         return bytearray([0x00] * 19)
 
 
+class CapabilitiesQuery(MessageRequest):
+    """Message query capability."""
+
+    def __init__(self, device_type: DeviceType) -> None:
+        """Initialize message query capability."""
+        super().__init__(
+            device_type=device_type,
+            protocol_version=0,
+            message_type=MessageType.query,
+            body_type=ListTypes.B5,
+        )
+
+
+class CapabilitiesAdditionalQuery(CapabilitiesQuery):
+    """Message query capability addition."""
+
+
 class BodyParser[T]:
     """Body parser to decode message."""
 
@@ -962,4 +979,12 @@ class MessageApplianceResponse(MessageResponse):
 
     def __init__(self, message: bytearray) -> None:
         """Initialize message appliance response."""
+        super().__init__(message)
+
+
+class CapabilityResponse(MessageResponse):
+    """Message capability response."""
+
+    def __init__(self, message: bytearray) -> None:
+        """Initialize message capability response."""
         super().__init__(message)

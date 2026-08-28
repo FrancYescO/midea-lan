@@ -467,7 +467,7 @@ class NewProtocolQuery(MessageACBase):
         self,
         protocol_version: int,
         *,
-        supports_rate_select: bool = False,
+        caps: dict[str, bool | int] | None = None,
     ) -> None:
         """Initialize AC message new protocol query.
 
@@ -481,7 +481,7 @@ class NewProtocolQuery(MessageACBase):
             message_type=MessageType.query,
             body_type=ListTypes.B1,
         )
-        self._supports_rate_select = supports_rate_select
+        self._supports_rate_select = caps.get("rate_select", False) if caps else False
 
     @property
     def _body(self) -> bytearray:

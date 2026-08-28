@@ -321,8 +321,6 @@ class MideaACDevice(MideaDevice):
         self._bb_timer: bool = False
         # per-mode setpoint limits from the B5 capability, keyed by mode value
         self._temperature_limits: dict[int, tuple[float, float]] | None = None
-        # decoded B5 capability flags (accumulated across B5 frames)
-        self._capabilities: dict[str, bool] = {}
         # manual setpoint limits from customize (highest priority)
         self._customize_min_temperature: float | None = None
         self._customize_max_temperature: float | None = None
@@ -384,10 +382,7 @@ class MideaACDevice(MideaDevice):
             ]
         queries: list[ACQuery] = [
             MessageQuery(self._message_protocol_version),
-            NewProtocolQuery(
-                self._message_protocol_version,
-                supports_rate_select=self._capabilities.get("rate_select", False),
-            ),
+            NewProtocolQuery(self._message_protocol_version, caps=self._capabilities),
             # Queried on its own so an empty response for the combined
             # new-protocol query does not suppress the self-clean state.
             NewProtocolSelfCleanQuery(self._message_protocol_version),
@@ -529,7 +524,6 @@ class MideaACDevice(MideaDevice):
                 self._attributes[DeviceAttributes.self_clean] = active
                 new_status[DeviceAttributes.self_clean.value] = active
         new_status.update(self._refresh_temperature_limits(message))
-        self._update_capabilities(message)
         return new_status
 
     @staticmethod
@@ -556,16 +550,6 @@ class MideaACDevice(MideaDevice):
             if self._refresh_interval > 0
             else self._default_refresh_interval
         )
-
-    def _update_capabilities(self, message: MessageACResponse) -> None:
-        """Accumulate decoded B5 capability flags from a B5 response."""
-        if hasattr(message, "capabilities"):
-            self._capabilities.update(message.capabilities)
-
-    @property
-    def capabilities(self) -> dict[str, bool]:
-        """Return the decoded B5 capability flags reported by the device."""
-        return self._capabilities
 
     def _b5_temperature_limits(self) -> tuple[float, float] | None:
         """Return the B5 setpoint limits for the current mode, if any.

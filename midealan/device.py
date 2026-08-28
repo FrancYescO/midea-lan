@@ -13,6 +13,10 @@ from typing_extensions import deprecated
 from .const import DeviceType, ProtocolVersion
 from .exceptions import SocketException
 from .message import (
+    CapabilitiesAdditionalQuery,
+    CapabilitiesQuery,
+    CapabilityResponse,
+    ListTypes,
     MessageApplianceResponse,
     MessageQueryAppliance,
     MessageQuestCustom,
@@ -29,6 +33,7 @@ from .security import (
 MIN_AUTH_RESPONSE = 20
 MIN_MSG_LENGTH = 56
 MESSAGE_TYPE_INDEX = 9  # offset of the message-type byte in the 10-byte header
+BODY_TYPE_INDEX = 10
 MIN_V2_FACTUAL_MSG_LENGTH = 6
 RESPONSE_TIMEOUT = 12  # main loop socket recv timeout, 12 * 10s = 120s
 SOCKET_TIMEOUT = 10  # socket connection default timeout
@@ -123,6 +128,12 @@ class MideaDevice(threading.Thread):
         self._is_run: bool = False
         self._available = False
         self._appliance_query = True
+        self._capability_query = True
+        self._capability_addition_query = True
+        self._support_capability = False
+        self._support_capability_addition = False
+        # decoded B5 capability
+        self._capabilities: dict[str, bool | int] = {}
         self._refresh_interval = 30
         self._heartbeat_interval = SOCKET_TIMEOUT
         self._default_refresh_interval = 30
@@ -218,6 +229,11 @@ class MideaDevice(threading.Thread):
     def serial_number(self) -> str | None:
         """Device serial number."""
         return self._serial_number
+
+    @property
+    def capabilities(self) -> dict[str, bool | int]:
+        """Return the decoded B5 capability flags reported by the device."""
+        return self._capabilities
 
     @staticmethod
     def fetch_v2_message(msg: bytes) -> tuple[list, bytes]:
@@ -398,8 +414,25 @@ class MideaDevice(threading.Thread):
         """Refresh device status."""
         real_cmds: list = self.build_query()
         cmds = real_cmds
+        _LOGGER.debug(
+            "[%s] start refresh_status with real_cmds: %s, cmds: %s,"
+            "appliance_query: %s, capability_query: %s, addition_query: %s,"
+            "device type %s",
+            self._device_id,
+            real_cmds,
+            cmds,
+            self._appliance_query,
+            self._capability_query,
+            self._capability_addition_query,
+            self._device_type,
+        )
         if self._appliance_query:
-            cmds = [MessageQueryAppliance(self.device_type), *real_cmds]
+            cmds = [MessageQueryAppliance(self._device_type), *real_cmds]
+        # query capability and capability addition for AC device
+        if self._capability_query and self._device_type == DeviceType.AC:
+            cmds = [CapabilitiesQuery(self._device_type), *real_cmds]
+        if self._capability_addition_query and self._device_type == DeviceType.AC:
+            cmds = [CapabilitiesAdditionalQuery(self._device_type), *real_cmds]
         error_count = 0
         _LOGGER.debug(
             "[%s] refresh_status with cmds: %s, check_protocol %s, "
@@ -489,8 +522,8 @@ class MideaDevice(threading.Thread):
                 )
                 raise NoSupportedProtocol
 
-    def pre_process_message(self, msg: bytearray) -> bool:
-        """Pre process message."""
+    def parse_appliance_response(self, msg: bytearray) -> bool:
+        """Parse appliance response."""
         if len(msg) <= MESSAGE_TYPE_INDEX:
             # Some devices answer a query with a payload shorter than the
             # header (observed: a 4-byte `01000000` from a 0xFA tower fan).
@@ -505,9 +538,9 @@ class MideaDevice(threading.Thread):
         if msg[MESSAGE_TYPE_INDEX] == MessageType.query_appliance:
             message = MessageApplianceResponse(msg)
             self._appliance_query = False
-            _LOGGER.debug("[%s] Appliance query Received: %s", self._device_id, message)
+            _LOGGER.debug("[%s] Appliance query Response: %s", self._device_id, message)
             self._message_protocol_version = message.protocol_version
-            _LOGGER.debug(
+            _LOGGER.info(
                 "[%s] device model %s subtype %s, device protocol %s, msg protocol %s",
                 self._device_id,
                 self._model,
@@ -516,6 +549,54 @@ class MideaDevice(threading.Thread):
                 self._message_protocol_version,
             )
             return False
+        return True
+
+    def parse_capability_response(self, msg: bytearray) -> bool:
+        """Parse capability response."""
+        if (
+            msg[MESSAGE_TYPE_INDEX] == MessageType.query
+            and msg[BODY_TYPE_INDEX] == ListTypes.B5
+        ):
+            message = CapabilityResponse(msg)
+            self._capability_query = False
+            self._support_capability = True
+            _LOGGER.debug("[%s] Capability Response: %s", self._device_id, message)
+            if hasattr(message, "capabilities"):
+                _capabilities = message.capabilities
+                self._capabilities.update(_capabilities)
+                _LOGGER.info(
+                    "[%s] basic capabilities: %s, merged capabilities: %s",
+                    self._device_id,
+                    _capabilities,
+                    self._capabilities,
+                )
+                return False
+        return True
+
+    def parse_addition_capability_response(self, msg: bytearray) -> bool:
+        """Parse capability response."""
+        if (
+            msg[MESSAGE_TYPE_INDEX] == MessageType.query
+            and msg[BODY_TYPE_INDEX] == ListTypes.B5
+        ):
+            message = CapabilityResponse(msg)
+            self._capability_addition_query = False
+            self._support_capability_addition = True
+            _LOGGER.debug(
+                "[%s] Addition Capability Response: %s",
+                self._device_id,
+                message,
+            )
+            if hasattr(message, "capabilities"):
+                _capabilities = message.capabilities
+                self._capabilities.update(_capabilities)
+                _LOGGER.info(
+                    "[%s] addition capabilities: %s, merged capabilities: %s",
+                    self._device_id,
+                    _capabilities,
+                    self._capabilities,
+                )
+                return False
         return True
 
     def parse_message(self, msg: bytes) -> MessageResult:
@@ -540,10 +621,24 @@ class MideaDevice(threading.Thread):
                     try:
                         cont = True
                         if self._appliance_query:
-                            cont = self.pre_process_message(decrypted)
+                            cont = self.parse_appliance_response(decrypted)
+                        # current only apply for AC device capability response
+                        if self._capability_query and self.device_id == DeviceType.AC:
+                            cont = self.parse_capability_response(decrypted)
+                            if len(self._capabilities) > 0:
+                                status = {"capabilities": dict(self._capabilities)}
+                                self.update_all(status)
+                        if (
+                            self._capability_addition_query
+                            and self.device_type == DeviceType.AC
+                        ):
+                            cont = self.parse_addition_capability_response(decrypted)
+                            if len(self._capabilities) > 0:
+                                status = {"capabilities": dict(self._capabilities)}
+                                self.update_all(status)
                         if cont:
                             _LOGGER.debug(
-                                "[%s] process message %s for device %s, \
+                                "[%s] parse message %s for device %s, \
                                 model %s, subtype %s, \
                                 device protocol %s, message procol %s",
                                 self._device_id,
@@ -564,7 +659,7 @@ class MideaDevice(threading.Thread):
                                 )
                     except Exception:
                         _LOGGER.exception(
-                            "[%s] Error in process message %s, \
+                            "[%s] Error in parse message %s, \
                                 model %s, subtype %s, \
                                 device protocol %s, message procol %s",
                             self._device_id,
@@ -700,6 +795,8 @@ class MideaDevice(threading.Thread):
                 # pre_process_message and was never set back, so a reconnected device
                 # would skip protocol detection and re-probe with build_query() alone.
                 self._appliance_query = True
+                self._capability_query = True
+                self._capability_addition_query = True
                 self._buffer = b""
         if sock is not None:
             try:
