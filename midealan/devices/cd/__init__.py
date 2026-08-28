@@ -593,6 +593,20 @@ class MideaCDDevice(MideaDevice):
         )
         self.build_send(message)
 
+    @staticmethod
+    def _has_valid_timer_data(attr: str, value: dict[Any, Any]) -> bool:
+        """Return whether a schedule contains safe timer collections."""
+        timer_groups = (
+            [value.get(day, []) for day in range(7)]
+            if attr == DeviceAttributes.weekly_schedule
+            else [value.get("timers", [])]
+        )
+        return all(
+            isinstance(timers, list)
+            and all(isinstance(timer, dict) for timer in timers)
+            for timers in timer_groups
+        )
+
     def set_attribute(  # noqa: C901, PLR0911
         self,
         attr: str,
@@ -603,6 +617,9 @@ class MideaCDDevice(MideaDevice):
             DeviceAttributes.maintenance_reminder,
             DeviceAttributes.maintain_warn_tag,
         ]:
+            if isinstance(value, dict):
+                _LOGGER.warning("[%s] %s requires a scalar value", self.device_id, attr)
+                return
             self._set_maintenance_reminder(bool(value))
             return
 
@@ -627,6 +644,9 @@ class MideaCDDevice(MideaDevice):
                     self.device_id,
                     attr,
                 )
+                return
+            if not self._has_valid_timer_data(attr, value):
+                _LOGGER.warning("[%s] %s has invalid timer data", self.device_id, attr)
                 return
             if attr == DeviceAttributes.weekly_schedule:
                 weekly = MessageSetWeekly(self._message_protocol_version)
