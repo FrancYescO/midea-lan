@@ -11,8 +11,10 @@ from midealan.devices.cd.message import (
     MessageQueryB1,
     MessageQueryDaily,
     MessageQueryWeekly,
+    MessageSetDaily,
     MessageSetMaintenance,
     MessageSetSterilize,
+    MessageSetWeekly,
 )
 from midealan.message import MessageType
 
@@ -852,6 +854,21 @@ class TestMideaCDExtendedDevice:
         assert len(queries) == 4
         assert isinstance(queries[-1], MessageQueryB1)
 
+    def test_optional_modes_follow_reported_capabilities(self) -> None:
+        """Optional modes appear only after their capability is reported."""
+        self.device._attributes[DeviceAttributes.support_heat_pump_mode] = True
+        self.device._attributes[DeviceAttributes.support_boost_mode] = True
+        self.device._attributes[DeviceAttributes.support_silent_mode] = True
+        assert self.device.preset_modes == [
+            "Economy",
+            "Hybrid",
+            "E-Heater",
+            "Smart",
+            "Heat-pump",
+            "Boost",
+            "Silent",
+        ]
+
     def test_disinfection_write_uses_extended_payload(self) -> None:
         """Immediate disinfection preserves schedule and setpoint."""
         self.device._attributes[DeviceAttributes.disinfection_temperature] = 67.0
@@ -864,6 +881,34 @@ class TestMideaCDExtendedDevice:
         assert isinstance(message, MessageSetSterilize)
         assert message.body == bytearray([0x06, 0x01, 0x80, 4, 14, 5, 67])
 
+    def test_disinfection_defaults_temperature_and_rejects_mapping(self) -> None:
+        """Extended disinfection has a safe default and rejects mappings."""
+        self.device._attributes[DeviceAttributes.disinfection_temperature] = None
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.disinfect.value, True)
+            message = mock_send.call_args.args[0]
+            assert message.disinfection_temperature == 60.0
+            mock_send.reset_mock()
+            self.device.set_attribute(DeviceAttributes.disinfect.value, {})
+            mock_send.assert_not_called()
+
+    def test_schedule_writes_require_support_and_mapping(self) -> None:
+        """Weekly and daily mappings use their dedicated message types."""
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.weekly_schedule.value, {})
+            assert isinstance(mock_send.call_args.args[0], MessageSetWeekly)
+            self.device.set_attribute(DeviceAttributes.daily_timer_schedule.value, {})
+            assert isinstance(mock_send.call_args.args[0], MessageSetDaily)
+            mock_send.reset_mock()
+            self.device.set_attribute(DeviceAttributes.weekly_schedule.value, True)
+            mock_send.assert_not_called()
+
+    def test_scalar_controls_reject_mappings(self) -> None:
+        """Ordinary scalar controls never accept schedule-like mappings."""
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.power.value, {})
+        mock_send.assert_not_called()
+
     def test_max_temperature_is_clamped_to_reported_limit(self) -> None:
         """Maximum target temperature uses BasicControl byte 23."""
         self.device._attributes[DeviceAttributes.max_temperature_lower_limit] = 40.0
@@ -872,6 +917,17 @@ class TestMideaCDExtendedDevice:
             self.device.set_attribute(DeviceAttributes.max_temperature.value, 75.0)
         message = mock_send.call_args.args[0]
         assert message.body[23] == 68
+
+    def test_max_temperature_clamps_target_and_schedule_mode(self) -> None:
+        """Reducing the maximum also clamps target; schedule mode stays 0..2."""
+        self.device._attributes[DeviceAttributes.target_temperature] = 69.0
+        with patch.object(self.device, "build_send") as mock_send:
+            self.device.set_attribute(DeviceAttributes.max_temperature.value, 65.0)
+            maximum = mock_send.call_args.args[0]
+            assert maximum.target_temperature == 65.0
+            self.device.set_attribute(DeviceAttributes.schedule_mode.value, 9.0)
+            schedule = mock_send.call_args.args[0]
+            assert schedule.schedule_mode == 2
 
     def test_maintenance_preserves_b1_flags(self) -> None:
         """Maintenance B0 control preserves priority, warning and reserved bits."""
