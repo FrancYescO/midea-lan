@@ -3,13 +3,14 @@
 import json
 import logging
 from enum import IntEnum, StrEnum
-from typing import Any, ClassVar, Unpack
+from typing import Any, ClassVar, Unpack, cast
 
 from midealan.const import DeviceType
 from midealan.device import MideaDevice, MideaDeviceInitKwargs
 from midealan.message import MessageType
 
 from .message import (
+    DailyTimerSchedule,
     MessageCDBase,
     MessageCDResponse,
     MessageQuery,
@@ -21,6 +22,7 @@ from .message import (
     MessageSetMaintenance,
     MessageSetSterilize,
     MessageSetWeekly,
+    WeeklySchedule,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -362,7 +364,9 @@ class MideaCDDevice(MideaDevice):
             DeviceAttributes.support_tou,
         )
 
-        def _source_is_extended(source: object) -> bool:
+        def _source_is_extended(source: object | None) -> bool:
+            if source is None:
+                return False
             if _value(source, DeviceAttributes.new_version_water_heater) is True:
                 return True
             if isinstance(_value(source, DeviceAttributes.b0_reserved_flags), int):
@@ -375,8 +379,6 @@ class MideaCDDevice(MideaDevice):
                 return True
             return any(_value(source, attribute) is True for attribute in capabilities)
 
-        if message is None:
-            return _source_is_extended(self._attributes)
         return _source_is_extended(message) or _source_is_extended(self._attributes)
 
     def _mode_map(self, message: object | None = None) -> dict[int, str]:
@@ -385,6 +387,13 @@ class MideaCDDevice(MideaDevice):
             self._extended_modes
             if self._is_extended_water_heater(message)
             else self._modes
+        )
+
+    def _mode_key(self, value: str) -> int | None:
+        """Return the protocol key from the capability-selected mode map."""
+        return next(
+            (key for key, name in self._mode_map().items() if name == value),
+            None,
         )
 
     def build_query(self) -> list[MessageCDBase]:
@@ -421,6 +430,8 @@ class MideaCDDevice(MideaDevice):
                 raw_value = getattr(message, str(attr))
                 # parse modes
                 if attr == DeviceAttributes.mode:
+                    # Extended mode 0x05 normally means Heat-pump, but the
+                    # dedicated vacation flag gives it Vacation semantics.
                     mode_str = (
                         "Vacation"
                         if self._is_extended_water_heater(message)
@@ -642,6 +653,11 @@ class MideaCDDevice(MideaDevice):
         else:
             if "amount" in value and not cls._is_integer_compatible(value["amount"]):
                 return False
+            if any(
+                flag in value and not isinstance(value[flag], bool)
+                for flag in ("single_timer_on", "single_timer_off")
+            ):
+                return False
             timer_groups = [value.get("timers", [])]
             numeric_fields = (
                 "openhour",
@@ -655,6 +671,7 @@ class MideaCDDevice(MideaDevice):
             isinstance(timers, list)
             and all(
                 isinstance(timer, dict)
+                and ("effect" not in timer or isinstance(timer["effect"], bool))
                 and all(
                     field not in timer or cls._is_integer_compatible(timer[field])
                     for field in numeric_fields
@@ -707,11 +724,11 @@ class MideaCDDevice(MideaDevice):
                 return
             if attr == DeviceAttributes.weekly_schedule:
                 weekly = MessageSetWeekly(self._message_protocol_version)
-                weekly.weekly_schedule = value
+                weekly.weekly_schedule = cast("WeeklySchedule", value)
                 self.build_send(weekly)
             else:
                 daily = MessageSetDaily(self._message_protocol_version)
-                daily.daily_timer_schedule = value
+                daily.daily_timer_schedule = cast("DailyTimerSchedule", value)
                 self.build_send(daily)
             return
 
@@ -820,14 +837,7 @@ class MideaCDDevice(MideaDevice):
                 # Fall back to 0x00 (no explicit operating mode).
                 message.mode = 0x00
             else:
-                mode_key = next(
-                    (
-                        key
-                        for key, name in self._mode_map().items()
-                        if name == str(current_mode)
-                    ),
-                    None,
-                )
+                mode_key = self._mode_key(str(current_mode))
                 message.mode = mode_key if mode_key is not None else 0x00
 
             # Update based on attribute being set
@@ -840,14 +850,7 @@ class MideaCDDevice(MideaDevice):
                         self.device_id,
                     )
                     return
-                mode_key = next(
-                    (
-                        key
-                        for key, name in self._mode_map().items()
-                        if name == str(value)
-                    ),
-                    None,
-                )
+                mode_key = self._mode_key(str(value))
                 if mode_key is None:
                     _LOGGER.warning(
                         "[%s] Invalid mode value: %s, not sending command",
@@ -897,6 +900,8 @@ class MideaCDDevice(MideaDevice):
                 message.vacation_days = days
 
             elif attr == DeviceAttributes.max_temperature:
+                # max_temperature is the configurable tsMax setting; the
+                # immutable device bounds are reported by the two limit attrs.
                 lower = self._attributes.get(
                     DeviceAttributes.max_temperature_lower_limit,
                 )
